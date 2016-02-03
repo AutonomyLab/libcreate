@@ -32,6 +32,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef CREATE_UTIL_H
 #define CREATE_UTIL_H
 
+#include <sys/time.h>
+
 #define COUT(prefix,msg) (std::cout<<prefix<<msg<<std::endl)
 #define CERR(prefix,msg) (std::cerr<<prefix<<msg<<std::endl)
 
@@ -46,7 +48,7 @@ namespace create {
     static const float CREATE_2_MAX_VEL = 0.5;
     static const float PI = 3.14159;
     static const float TWO_PI = 6.28318;
-    static const float EPS = 0.001;
+    static const float EPS = 0.0001;
   
     inline float normalizeAngle(const float& angle) {
       float a = angle;
@@ -55,6 +57,14 @@ namespace create {
       return a;
     };
 
+    /** Get a timestamp for the current time in micro-seconds.
+     */
+    typedef unsigned long long timestamp_t;
+    static timestamp_t getTimestamp() {
+      struct timeval now;
+      gettimeofday(&now, NULL);
+      return now.tv_usec + (timestamp_t) now.tv_sec * 1000000;
+    }
   }  // namespace util
 } // namespace create
 

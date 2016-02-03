@@ -185,6 +185,7 @@ namespace create {
     float yaw;
   };
 
+  typedef Pose Vel;
 } // namespace create
 
 #endif // CREATE_TYPES_H

@@ -30,6 +30,9 @@ namespace create {
     pose.x = 0;
     pose.y = 0;
     pose.yaw = 0;
+    vel.x = 0;
+    vel.y = 0;
+    vel.yaw = 0;
     data = boost::shared_ptr<Data>(new Data());
     serial = boost::make_shared<Serial>(data);
   }
@@ -52,8 +55,13 @@ namespace create {
       // Initialize tick counts
       prevTicksLeft = GET_DATA(ID_LEFT_ENC);
       prevTicksRight = GET_DATA(ID_RIGHT_ENC);
+      prevOnDataTime = util::getTimestamp();
       firstOnData = false;
     }
+
+    // Get current time
+    util::timestamp_t curTime = util::getTimestamp();
+    float dt = (curTime - prevOnDataTime) / 1000000.0;
 
     // Get cumulative ticks (wraps around at 65535)
     uint16_t totalTicksLeft = GET_DATA(ID_LEFT_ENC);
@@ -82,18 +90,39 @@ namespace create {
     float deltaDist = (rightWheelDist + leftWheelDist) / 2.0;
     
     // Moving straight
+    float deltaX, deltaY;
     if (fabs(wheelDistDiff) < util::EPS) {
-      pose.x += deltaDist * cos(pose.yaw);
-      pose.y += deltaDist * sin(pose.yaw);
+      deltaX = deltaDist * cos(pose.yaw);
+      deltaY = deltaDist * sin(pose.yaw);
+      vel.yaw = 0;
     }
     else {
       float turnRadius = (util::CREATE_2_AXLE_LENGTH / 2.0) * (leftWheelDist + rightWheelDist) / wheelDistDiff;
       float deltaYaw = (rightWheelDist - leftWheelDist) / util::CREATE_2_AXLE_LENGTH; 
-      pose.x += turnRadius * (sin(pose.yaw + deltaYaw) - sin(pose.yaw));
-      pose.y += turnRadius * (cos(pose.yaw + deltaYaw) - cos(pose.yaw));
+      deltaX = turnRadius * (sin(pose.yaw + deltaYaw) - sin(pose.yaw));
+      deltaY = turnRadius * (cos(pose.yaw + deltaYaw) - cos(pose.yaw));
       pose.yaw = util::normalizeAngle(pose.yaw + deltaYaw);
+      if (fabs(dt) > util::EPS) {
+        vel.yaw = deltaYaw / dt;
+      }
+      else {
+        vel.yaw = 0;
+      }
     }
   
+    if (fabs(dt) > util::EPS) {
+      vel.x = deltaX / dt;
+      vel.y = deltaY / dt;
+    }
+    else {
+      vel.x = 0;
+      vel.y = 0;
+    }
+
+    pose.x += deltaDist * cos(pose.yaw);
+    pose.y += deltaDist * sin(pose.yaw);
+   
+    prevOnDataTime = curTime;
     // Make user registered callbacks, if any
     // TODO
   }
@@ -470,6 +499,10 @@ namespace create {
   
   const Pose& Create::getPose() const {
     return pose;
+  }
+
+  const Vel& Create::getVel() const {
+    return vel;
   }
 
 } // end namespace
