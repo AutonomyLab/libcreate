@@ -34,12 +34,12 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/shared_ptr.hpp>
 #include <string>
-#include <sys/time.h>
 #include <unistd.h>
 
 #include "create/serial.h"
 #include "create/data.h"
 #include "create/types.h"
+#include "create/util.h"
 
 namespace create {
   class Create {
@@ -64,12 +64,14 @@ namespace create {
       uint8_t powerLEDIntensity;
 
       create::Pose pose;
+      create::Vel vel;
       
       uint32_t prevTicksLeft;
       uint32_t prevTicksRight;
       float prevLeftVel;
       float prevRightVel;
       bool firstOnData;
+      util::timestamp_t prevOnDataTime;
 
       void init();
       bool updateLEDs();
@@ -346,6 +348,10 @@ namespace create {
       /* Get the estimated position of Create based on it's wheel encoders.
        */
       const create::Pose& getPose() const;
+
+      /* Get the estimated velocity of Create based on wheel encoders.
+       */
+      const create::Vel& getVel() const;
   };  // end Create class
 
 }  // namespace create
