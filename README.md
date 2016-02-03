@@ -22,3 +22,5 @@ C++ library for interfacing with iRobot's [Create 2](http://www.irobot.com/About
 See source for examples.
  
 Example compile line: `g++ create_demo.cpp -lcreate -lboost_system -lboost_thread`
+
+![Build Status](https://api.travis-ci.org/AutonomyLab/libcreate.svg?branch=master)
