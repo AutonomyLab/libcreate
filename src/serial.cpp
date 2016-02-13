@@ -4,31 +4,31 @@
 #include "create/types.h"
 
 namespace create {
-  
+
   Serial::Serial(boost::shared_ptr<Data> d, const uint8_t& header) :
     data(d),
     headerByte(header),
-    port(io), 
-    readState(READ_HEADER), 
+    port(io),
+    readState(READ_HEADER),
     isReading(false),
     dataReady(false),
     corruptPackets(0),
-    totalPackets(0) { 
+    totalPackets(0) {
     //std::cout << "# Serial Created" << std::endl;
   }
-  
-  Serial::~Serial() { 
+
+  Serial::~Serial() {
     disconnect();
     //std::cout << "# Serial Destroyed" << std::endl;
   }
-  
+
   bool Serial::connect(const std::string& portName, const int& baud, boost::function<void()> cb) {
     //std::cout << "## Serial connect start" << std::endl;
     using namespace boost::asio;
     port.open(portName);
     port.set_option(serial_port::baud_rate(baud));
     port.set_option(serial_port::flow_control(serial_port::flow_control::none));
-  
+
     if (port.is_open()) {
       callback = cb;
       bool startReadSuccess = startReading();
@@ -40,7 +40,7 @@ namespace create {
     //std::cout << "## Serial connect failed" << std::endl;
     return false;
   }
-  
+
   void Serial::disconnect() {
     if (isReading) {
       stopReading();
@@ -56,7 +56,7 @@ namespace create {
       //std::cout << "## Serial disconnect done" << std::endl;
     }
   }
-  
+
   bool Serial::startReading() {
     if (!connected()) return false;
 
@@ -85,10 +85,10 @@ namespace create {
     sendOpcode(OC_START);
 
     // Start streaming data
-    send(streamReq, 2 + numPackets); 
- 
+    send(streamReq, 2 + numPackets);
+
     expectedNumBytes = data->getTotalDataBytes() + numPackets;
-    
+
     //TODO: handle boost exceptions
 
     io.reset();
@@ -98,7 +98,7 @@ namespace create {
                             boost::asio::buffer(&byteRead, 1),
                             boost::bind(&Serial::onData, this, _1, _2));
 
-    ioThread = boost::thread(boost::bind(&boost::asio::io_service::run, &io)); 
+    ioThread = boost::thread(boost::bind(&boost::asio::io_service::run, &io));
 
     // Wait for first complete read to finish
     boost::unique_lock<boost::mutex> lock(dataReadyMut);
@@ -112,12 +112,12 @@ namespace create {
           io.stop();
           ioThread.join();
           return false;
-        } 
+        }
         attempts++;
         //std::cout << "Requesting data from Create. Attempt " << attempts << std::endl;
         // Request data again
         sendOpcode(OC_START);
-        send(streamReq, 2 + numPackets); 
+        send(streamReq, 2 + numPackets);
       }
     }
     //std::cout << "#### Data is ready." << std::endl;
@@ -125,7 +125,7 @@ namespace create {
     //std::cout << "### Serial start reading DONE" << std::endl;
     return true;
   }
-  
+
   void Serial::stopReading() {
     if (isReading) {
       //std::cout << "### Start stopReading" << std::endl;
@@ -146,7 +146,7 @@ namespace create {
       CERR("[create::Serial] ", "serial error - " << e.message());
       return;
     }
-  
+
     // Should have read exactly one byte
     if (size == 1) {
       numBytesRead++;
@@ -158,16 +158,16 @@ namespace create {
             byteSum = byteRead;
           }
         break;
-  
+
         case READ_NBYTES:
           if (byteRead == expectedNumBytes) {
             readState = READ_PACKET_ID;
             numBytesRead = 0;
           }
-          else 
+          else
             readState = READ_HEADER;
         break;
-  
+
         case READ_PACKET_ID:
           packetID = byteRead;
           if (data->isValidPacketID(packetID)) {
@@ -181,7 +181,7 @@ namespace create {
             readState = READ_HEADER;
           }
         break;
-  
+
         case READ_PACKET_BYTES:
           numDataBytesRead++;
           if (expectedNumDataBytes == 2 && numDataBytesRead == 1) {
@@ -200,7 +200,7 @@ namespace create {
               readState = READ_PACKET_ID;
           }
         break;
-  
+
         case READ_CHECKSUM:
           if ((byteSum & 0xFF) == 0) {
             // Validate all packets
@@ -218,7 +218,7 @@ namespace create {
             }
             // Callback to notify data is ready
             if (callback)
-              callback();        
+              callback();
           }
           else {
             // Corrupt data
@@ -236,10 +236,10 @@ namespace create {
                             boost::asio::buffer(&byteRead, 1),
                             boost::bind(&Serial::onData, this, _1, _2));
   }
-  
+
   bool Serial::send(const uint8_t* bytes, unsigned int numBytes) {
     if (!connected()) {
-      CERR("[create::Serial] ", "send failed, not connected."); 
+      CERR("[create::Serial] ", "send failed, not connected.");
       return false;
     }
     // TODO: catch boost exceptions
@@ -252,4 +252,11 @@ namespace create {
     return send(&oc, 1);
   }
 
+  uint64_t Serial::getNumCorruptPackets() {
+    return corruptPackets;
+  }
+
+  uint64_t Serial::getNumTotalPackets() {
+    return totalPackets;
+  }
 } // namespace create
