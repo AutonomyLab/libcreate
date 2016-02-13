@@ -14,16 +14,13 @@ namespace create {
     dataReady(false),
     corruptPackets(0),
     totalPackets(0) {
-    //std::cout << "# Serial Created" << std::endl;
   }
 
   Serial::~Serial() {
     disconnect();
-    //std::cout << "# Serial Destroyed" << std::endl;
   }
 
   bool Serial::connect(const std::string& portName, const int& baud, boost::function<void()> cb) {
-    //std::cout << "## Serial connect start" << std::endl;
     using namespace boost::asio;
     port.open(portName);
     port.set_option(serial_port::baud_rate(baud));
@@ -32,12 +29,11 @@ namespace create {
     if (port.is_open()) {
       callback = cb;
       bool startReadSuccess = startReading();
-      if (!startReadSuccess)
+      if (!startReadSuccess) {
         port.close();
-      //std::cout << "## Serial connect done" << std::endl;
+      }
       return startReadSuccess;
     }
-    //std::cout << "## Serial connect failed" << std::endl;
     return false;
   }
 
@@ -47,13 +43,11 @@ namespace create {
     }
 
     if (connected()) {
-      //std::cout << "## Serial disconnect start" << std::endl;
       // Ensure not in Safe/Full modes
       sendOpcode(OC_START);
       // Stop OI
       sendOpcode(OC_STOP);
       port.close();
-      //std::cout << "## Serial disconnect done" << std::endl;
     }
   }
 
@@ -68,7 +62,6 @@ namespace create {
     // Only allow once
     if (isReading) return true;
 
-    //std::cout << "### Serial start reading" << std::endl;
     // Request from Create that we want a stream containing all packets
     uint8_t numPackets = data->getNumPackets();
     std::vector<uint8_t> packetIDs = data->getPacketIDs();
@@ -102,7 +95,7 @@ namespace create {
 
     // Wait for first complete read to finish
     boost::unique_lock<boost::mutex> lock(dataReadyMut);
-    //std::cout << "#### Waiting for dataReady" << std::endl;
+
     int attempts = 1;
     int maxAttempts = 10;
     while (!dataReady) {
@@ -114,21 +107,19 @@ namespace create {
           return false;
         }
         attempts++;
-        //std::cout << "Requesting data from Create. Attempt " << attempts << std::endl;
+
         // Request data again
         sendOpcode(OC_START);
         send(streamReq, 2 + numPackets);
       }
     }
-    //std::cout << "#### Data is ready." << std::endl;
+
     isReading = true;
-    //std::cout << "### Serial start reading DONE" << std::endl;
     return true;
   }
 
   void Serial::stopReading() {
     if (isReading) {
-      //std::cout << "### Start stopReading" << std::endl;
       io.stop();
       ioThread.join();
       isReading = false;
@@ -136,12 +127,10 @@ namespace create {
         boost::lock_guard<boost::mutex> lock(dataReadyMut);
         dataReady = false;
       }
-      //std::cout << "### End stopReading" << std::endl;
     }
   }
 
   void Serial::onData(const boost::system::error_code& e, const std::size_t& size) {
-    //std::cout << "#### onData" << std::endl;
     if (e) {
       CERR("[create::Serial] ", "serial error - " << e.message());
       return;
@@ -185,11 +174,11 @@ namespace create {
         case READ_PACKET_BYTES:
           numDataBytesRead++;
           if (expectedNumDataBytes == 2 && numDataBytesRead == 1) {
-            // high byte first
+            // High byte first
             packetBytes = (byteRead << 8) & 0xff00;
           }
           else {
-            // low byte
+            // Low byte
             packetBytes += byteRead;
           }
           if (numDataBytesRead >= expectedNumDataBytes) {
@@ -209,11 +198,9 @@ namespace create {
             // Notify first data packets ready
             {
               boost::lock_guard<boost::mutex> lock(dataReadyMut);
-             // std::cout << "locking." << std::endl;
               if (!dataReady) {
                 dataReady = true;
                 dataReadyCond.notify_one();
-                //std::cout << "##### Notified." << std::endl;
               }
             }
             // Callback to notify data is ready

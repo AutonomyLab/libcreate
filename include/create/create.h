@@ -18,9 +18,9 @@ modification, are permitted provided that the following conditions are met:
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
 CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
 SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
 INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
@@ -65,7 +65,7 @@ namespace create {
 
       create::Pose pose;
       create::Vel vel;
-      
+
       uint32_t prevTicksLeft;
       uint32_t prevTicksRight;
       float prevLeftVel;
@@ -108,8 +108,10 @@ namespace create {
       /* Resets as if you have removed the battery.
        * Changes mode to MODE_PASSIVE.
        */
+      // TODO
       //void reset();
 
+      // TODO
       //void setBaud(int baudcode);
 
       /* Change Create mode.
@@ -145,6 +147,7 @@ namespace create {
 
       /* Set the PWM for each wheel.
        */
+      // TODO
       //void drivePWM(const int16_t& leftWheel, const int16_t& rightWheel) const;
 
       /* Set the forward and angular velocity of Create.
@@ -206,6 +209,7 @@ namespace create {
       //void setDigits(uint8_t digit1, uint8_t digit2,
       //               uint8_t digit3, uint8_t digit4);
 
+      // TODO
       // pushButton(...);
 
       /* Set the four 7-segment display digits from left to right with ASCII codes.
@@ -236,6 +240,7 @@ namespace create {
        */
       bool playSong(const uint8_t& songNumber) const;
 
+      // TODO
       //void registerCallback(...);
 
       /* True if a left or right wheeldrop is detected.

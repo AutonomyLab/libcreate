@@ -18,9 +18,9 @@ modification, are permitted provided that the following conditions are met:
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
 CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
 SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
 INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
@@ -39,20 +39,19 @@ namespace create {
       uint16_t data;
       uint16_t tmpData;
       mutable boost::mutex dataMutex;
+      mutable boost::mutex tmpDataMutex;
 
     public:
-      // TODO: Do they really need to be const? then they better be static
-      // I am actually not sure if const member vars are valid
       const uint8_t nbytes;
       const std::string info;
 
       Packet(const uint8_t& nbytes, const std::string& info);
       ~Packet();
+
+      // All of the following are thread safe
       void setTempData(const uint16_t& td);
       void validate();
-      // thread safe
       void setData(const uint16_t& d);
-      // thread safe
       uint16_t getData() const;
   };
 

@@ -18,9 +18,9 @@ modification, are permitted provided that the following conditions are met:
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
 CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
 SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
 INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
@@ -49,7 +49,7 @@ namespace create {
     static const float PI = 3.14159;
     static const float TWO_PI = 6.28318;
     static const float EPS = 0.0001;
-  
+
     inline float normalizeAngle(const float& angle) {
       float a = angle;
       while (a < -PI) a += TWO_PI;
@@ -57,9 +57,10 @@ namespace create {
       return a;
     };
 
+    typedef unsigned long long timestamp_t;
+
     /** Get a timestamp for the current time in micro-seconds.
      */
-    typedef unsigned long long timestamp_t;
     static timestamp_t getTimestamp() {
       struct timeval now;
       gettimeofday(&now, NULL);

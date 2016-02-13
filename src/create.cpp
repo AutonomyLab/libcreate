@@ -1,7 +1,7 @@
 #include <boost/bind.hpp>
 #include <boost/make_shared.hpp>
 #include <iostream>
-#include <cmath> 
+#include <cmath>
 #include <ctime>
 #include <assert.h>
 
@@ -45,11 +45,11 @@ namespace create {
     init();
     serial->connect(dev, baud);
   }
-  
+
   Create::~Create() {
     disconnect();
   }
-  
+
   void Create::onData() {
     if (firstOnData) {
       // Initialize tick counts
@@ -88,7 +88,7 @@ namespace create {
 
     float wheelDistDiff = rightWheelDist - leftWheelDist;
     float deltaDist = (rightWheelDist + leftWheelDist) / 2.0;
-    
+
     // Moving straight
     float deltaX, deltaY;
     if (fabs(wheelDistDiff) < util::EPS) {
@@ -98,7 +98,7 @@ namespace create {
     }
     else {
       float turnRadius = (util::CREATE_2_AXLE_LENGTH / 2.0) * (leftWheelDist + rightWheelDist) / wheelDistDiff;
-      float deltaYaw = (rightWheelDist - leftWheelDist) / util::CREATE_2_AXLE_LENGTH; 
+      float deltaYaw = (rightWheelDist - leftWheelDist) / util::CREATE_2_AXLE_LENGTH;
       deltaX = turnRadius * (sin(pose.yaw + deltaYaw) - sin(pose.yaw));
       deltaY = turnRadius * (cos(pose.yaw + deltaYaw) - cos(pose.yaw));
       pose.yaw = util::normalizeAngle(pose.yaw + deltaYaw);
@@ -109,7 +109,7 @@ namespace create {
         vel.yaw = 0;
       }
     }
-  
+
     if (fabs(dt) > util::EPS) {
       vel.x = deltaX / dt;
       vel.y = deltaY / dt;
@@ -121,12 +121,12 @@ namespace create {
 
     pose.x += deltaDist * cos(pose.yaw);
     pose.y += deltaDist * sin(pose.yaw);
-   
+
     prevOnDataTime = curTime;
     // Make user registered callbacks, if any
     // TODO
   }
-  
+
   bool Create::connect(const std::string& port, const int& baud) {
     bool timeout = false;
     time_t start, now;
@@ -144,33 +144,33 @@ namespace create {
         COUT("[create::Create] ", "retrying to establish serial connection...");
       }
     }
-  
+
     return !timeout;
   }
-  
+
   void Create::disconnect() {
     serial->disconnect();
     firstOnData = true;
   }
-  
+
   //void Create::reset() {
   //  serial->sendOpcode(OC_RESET);
   //  serial->reset(); // better
     // TODO : Should we request reading packets again?
   //}
-  
+
   bool Create::setMode(const CreateMode& mode) {
     return serial->sendOpcode((Opcode) mode);
   }
-  
+
   bool Create::clean(const CleanMode& mode) {
     return serial->sendOpcode((Opcode) mode);
   }
-  
+
   bool Create::dock() const {
     return serial->sendOpcode(OC_DOCK);
   }
-  
+
   bool Create::setDate(const DayOfWeek& day, const uint8_t& hour, const uint8_t& min) const {
     if (day < 0 || day > 6 ||
         hour < 0 || hour > 23 ||
@@ -180,7 +180,7 @@ namespace create {
     uint8_t cmd[4] = { OC_DATE, day, hour, min };
     return serial->send(cmd, 4);
   }
-  
+
   /*void Create::driveRadius(const float& vel, const float& radius) const {
     // Expects each parameter as two bytes each and in millimeters
     int16_t vel_mm = roundf(vel * 1000);
@@ -199,7 +199,7 @@ namespace create {
                        radius_mm >> 8,
                        radius_mm & 0xff
                      };
-  
+
     serial->send(cmd, 5);
   }
   */
@@ -218,7 +218,7 @@ namespace create {
                      };
     return serial->send(cmd, 5);
   }
-  
+
   /*void Create::drivePWM(const int16_t& leftPWM, const int16_t& rightPWM) const {
     uint8_t cmd[5] = { OC_DRIVE_PWM,
                        rightPWM >> 8,
@@ -229,45 +229,45 @@ namespace create {
     serial->send(cmd, 5);
   }
   */
-  
+
   bool Create::drive(const float& xVel, const float& angularVel) const {
     // Compute left and right wheel velocities
     float leftVel = xVel - ((util::CREATE_2_AXLE_LENGTH / 2.0) * angularVel);
     float rightVel = xVel + ((util::CREATE_2_AXLE_LENGTH / 2.0) * angularVel);
     return driveWheels(leftVel, rightVel);
   }
-  
+
   bool Create::setAllMotors(const float& main, const float& side, const float& vacuum) {
     if (main < -1.0 || main > 1.0 ||
         side < -1.0 || side > 1.0 ||
         vacuum < -1.0 || vacuum > 1.0)
-      return false;    
+      return false;
 
     mainMotorPower = roundf(main * 127);
     sideMotorPower = roundf(side * 127);
     vacuumMotorPower = roundf(vacuum * 127);
-  
+
     uint8_t cmd[4] = { OC_MOTORS_PWM,
                         mainMotorPower,
                         sideMotorPower,
                         vacuumMotorPower
                       };
-  
+
     return serial->send(cmd, 4);
   }
-  
+
   bool Create::setMainMotor(const float& main) {
     return setAllMotors(main, sideMotorPower, vacuumMotorPower);
   }
-  
+
   bool Create::setSideMotor(const float& side) {
     return setAllMotors(mainMotorPower, side, vacuumMotorPower);
   }
-  
+
   bool Create::setVacuumMotor(const float& vacuum) {
     return setAllMotors(mainMotorPower, sideMotorPower, vacuum);
   }
-  
+
   bool Create::updateLEDs() {
     uint8_t LEDByte = debrisLED + spotLED + dockLED + checkLED;
     uint8_t cmd[4] = { OC_LEDS,
@@ -275,10 +275,10 @@ namespace create {
                         powerLED,
                         powerLEDIntensity
                       };
-  
+
     return serial->send(cmd, 4);
   }
-  
+
   bool Create::enableDebrisLED(const bool& enable) {
     if (enable)
       debrisLED = LED_DEBRIS;
@@ -286,7 +286,7 @@ namespace create {
       debrisLED = 0;
     return updateLEDs();
   }
-  
+
   bool Create::enableSpotLED(const bool& enable) {
     if (enable)
       spotLED = LED_SPOT;
@@ -294,7 +294,7 @@ namespace create {
       spotLED = 0;
     return updateLEDs();
   }
-  
+
   bool Create::enableDockLED(const bool& enable) {
     if (enable)
       dockLED = LED_DOCK;
@@ -302,7 +302,7 @@ namespace create {
       dockLED = 0;
     return updateLEDs();
   }
-  
+
   bool Create::enableCheckRobotLED(const bool& enable) {
     if (enable)
       checkLED = LED_CHECK;
@@ -310,22 +310,22 @@ namespace create {
       checkLED = 0;
     return updateLEDs();
   }
-  
+
   bool Create::setPowerLED(const uint8_t& power, const uint8_t& intensity) {
     powerLED = power;
     powerLEDIntensity = intensity;
     return updateLEDs();
   }
-  
+
   //void Create::setDigits(uint8_t digit1, uint8_t digit2,
   //                       uint8_t digit3, uint8_t digit4) {
   //}
-  
+
   bool Create::setDigitsASCII(const uint8_t& digit1, const uint8_t& digit2,
                               const uint8_t& digit3, const uint8_t& digit4) const {
     if (digit1 < 32 || digit1 > 126 ||
-        digit2 < 32 || digit2 > 126 ||  
-        digit3 < 32 || digit3 > 126 ||  
+        digit2 < 32 || digit2 > 126 ||
+        digit3 < 32 || digit3 > 126 ||
         digit4 < 32 || digit4 > 126)
       return false;
 
@@ -335,10 +335,10 @@ namespace create {
                         digit3,
                         digit4
                       };
-  
+
     return serial->send(cmd, 5);
   }
-  
+
   bool Create::defineSong(const uint8_t& songNumber,
                           const uint8_t& songLength,
                           const uint8_t* notes,
@@ -358,44 +358,44 @@ namespace create {
       cmd[i + 1] = duration;
       j++;
     }
-  
+
     return serial->send(cmd, 2 * songLength + 3);
   }
-   
+
   bool Create::playSong(const uint8_t& songNumber) const {
     if (songNumber < 0 || songNumber > 4)
       return false;
     uint8_t cmd[2] = { OC_PLAY, songNumber };
     return serial->send(cmd, 2);
   }
-  
+
   bool Create::isWheeldrop() const {
     return (GET_DATA(ID_BUMP_WHEELDROP) & 0x0C) != 0;
   }
-  
+
   bool Create::isLeftBumper() const {
     return (GET_DATA(ID_BUMP_WHEELDROP) & 0x02) != 0;
   }
-  
+
   bool Create::isRightBumper() const {
     return (GET_DATA(ID_BUMP_WHEELDROP) & 0x01) != 0;
   }
-  
+
   bool Create::isWall() const {
     return GET_DATA(ID_WALL) == 1;
   }
-  
+
   bool Create::isCliff() const {
-    return GET_DATA(ID_CLIFF_LEFT) == 1 || 
+    return GET_DATA(ID_CLIFF_LEFT) == 1 ||
            GET_DATA(ID_CLIFF_FRONT_LEFT) == 1 ||
            GET_DATA(ID_CLIFF_FRONT_RIGHT) == 1 ||
            GET_DATA(ID_CLIFF_RIGHT) == 1;
   }
-  
+
   uint8_t Create::getDirtDetect() const {
     return GET_DATA(ID_DIRT_DETECT);
   }
-  
+
   uint8_t Create::getIROmni() const {
     return GET_DATA(ID_IR_OMNI);
   }
@@ -407,7 +407,7 @@ namespace create {
   uint8_t Create::getIRRight() const {
     return GET_DATA(ID_IR_RIGHT);
   }
-  
+
   ChargingState Create::getChargingState() const {
     uint8_t chargeState = GET_DATA(ID_CHARGE_STATE);
     assert(chargeState >= 0);
@@ -418,13 +418,13 @@ namespace create {
   bool Create::isCleanButtonPressed() const {
     return (GET_DATA(ID_BUTTONS) & 0x01) != 0;
   }
-  
-  // Not working. TODO Fix/report
+
+  // Not working
   bool Create::isClockButtonPressed() const {
     return (GET_DATA(ID_BUTTONS) & 0x80) != 0;
   }
 
-  // Not working. TODO Fix/report
+  // Not working
   bool Create::isScheduleButtonPressed() const {
     return (GET_DATA(ID_BUTTONS) & 0x40) != 0;
   }
@@ -448,55 +448,55 @@ namespace create {
   bool Create::isSpotButtonPressed() const {
     return (GET_DATA(ID_BUTTONS) & 0x02) != 0;
   }
-  
+
   uint16_t Create::getVoltage() const {
     return GET_DATA(ID_VOLTAGE);
   }
-  
+
   uint16_t Create::getCurrent() const {
     return GET_DATA(ID_CURRENT);
   }
-  
+
   uint8_t Create::getTemperature() const {
     return GET_DATA(ID_TEMP);
   }
-  
+
   uint16_t Create::getBatteryCharge() const {
     return GET_DATA(ID_CHARGE);
   }
-  
+
   uint16_t Create::getBatteryCapacity() const {
     return GET_DATA(ID_CAPACITY);
   }
-  
+
   bool Create::isIRDetectLeft() const {
     return (GET_DATA(ID_LIGHT) & 0x01) != 0;
   }
- 
-  bool Create::isIRDetectFrontLeft() const { 
+
+  bool Create::isIRDetectFrontLeft() const {
     return (GET_DATA(ID_LIGHT) & 0x02) != 0;
   }
 
-  bool Create::isIRDetectCenterLeft() const { 
+  bool Create::isIRDetectCenterLeft() const {
     return (GET_DATA(ID_LIGHT) & 0x04) != 0;
   }
 
-  bool Create::isIRDetectCenterRight() const { 
+  bool Create::isIRDetectCenterRight() const {
     return (GET_DATA(ID_LIGHT) & 0x08) != 0;
   }
 
-  bool Create::isIRDetectFrontRight() const { 
+  bool Create::isIRDetectFrontRight() const {
     return (GET_DATA(ID_LIGHT) & 0x10) != 0;
   }
 
-  bool Create::isIRDetectRight() const { 
+  bool Create::isIRDetectRight() const {
     return (GET_DATA(ID_LIGHT) & 0x20) != 0;
   }
 
   bool Create::isMovingForward() const {
     return GET_DATA(ID_STASIS) == 1;
   }
-  
+
   const Pose& Create::getPose() const {
     return pose;
   }

@@ -3,10 +3,10 @@
 #define ADD_PACKET(id,nbytes,info) (packets[id]=boost::make_shared<Packet>(nbytes,info))
 
 namespace create {
-  
+
   Data::Data() {
     // Populate data map
-    ADD_PACKET(ID_BUMP_WHEELDROP, 1, "bumps_wheeldrops"); 
+    ADD_PACKET(ID_BUMP_WHEELDROP, 1, "bumps_wheeldrops");
     ADD_PACKET(ID_WALL, 1, "wall");
     ADD_PACKET(ID_CLIFF_LEFT, 1, "cliff_left");
     ADD_PACKET(ID_CLIFF_FRONT_LEFT, 1, "cliff_front_left");
@@ -58,7 +58,7 @@ namespace create {
     ADD_PACKET(ID_MAIN_BRUSH_CURRENT, 2, "main_brush_current");
     ADD_PACKET(ID_SIDE_BRUSH_CURRENT, 2, "side_brush_current");
     ADD_PACKET(ID_STASIS, 1, "stasis");
-    
+
     totalDataBytes = 0;
     for (std::map<uint8_t, boost::shared_ptr<Packet> >::iterator it = packets.begin();
          it != packets.end();
@@ -67,23 +67,23 @@ namespace create {
       totalDataBytes += it->second->nbytes;
     }
   }
-  
+
   Data::~Data() { }
-  
+
   bool Data::isValidPacketID(uint8_t id) const {
     if (packets.count(id)) {
       return true;
     }
     return false;
   }
-  
+
   boost::shared_ptr<Packet> Data::getPacket(uint8_t id) {
     if (isValidPacketID(id)) {
       return packets[id];
     }
-    return boost::shared_ptr<Packet>(); //NULL;
+    return boost::shared_ptr<Packet>();
   }
-  
+
   void Data::validateAll() {
     for (std::map<uint8_t, boost::shared_ptr<Packet> >::iterator it = packets.begin();
          it != packets.end();
@@ -91,15 +91,15 @@ namespace create {
       it->second->validate();
     }
   }
-  
+
   unsigned int Data::getTotalDataBytes() const {
     return totalDataBytes;
   }
-  
+
   uint8_t Data::getNumPackets() const {
     return packets.size();
   }
-  
+
   std::vector<uint8_t> Data::getPacketIDs() {
     return ids;
   }

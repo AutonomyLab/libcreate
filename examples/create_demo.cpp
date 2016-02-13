@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
 
   std::cout << "battery level: " <<
     robot->getBatteryCharge() / (float) robot->getBatteryCapacity() * 100.0 << "%" << std::endl;
-  
+
   bool drive = false;
 
   // Make a song
@@ -29,8 +29,8 @@ int main(int argc, char** argv) {
   //                      67, 67, 66, 66, 65, 65, 66, 66 };
   //float durations[songLength];
   //for (int i = 0; i < songLength; i++) {
-  //  durations[i] = 0.25;   
-  //} 
+  //  durations[i] = 0.25;
+  //}
   //robot->createSong(0, songLength, notes, durations);
   //usleep(1000000);
   //robot->playSong(0);
@@ -38,9 +38,9 @@ int main(int argc, char** argv) {
   // Quit when center "Clean" button pressed
   while (!robot->isCleanButtonPressed()) {
     // Check for button presses
-    if (robot->isDayButtonPressed()) 
+    if (robot->isDayButtonPressed())
       std::cout << "day button press" << std::endl;
-    if (robot->isMinButtonPressed()) 
+    if (robot->isMinButtonPressed())
       std::cout << "min button press" << std::endl;
     if (robot->isDockButtonPressed()) {
       std::cout << "dock button press" << std::endl;
@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
     // If everything is ok, drive forward using IR's to avoid obstacles
     if (drive) {
       robot->setPowerLED(0); // green
-      if (robot->isIRDetectLeft() || 
+      if (robot->isIRDetectLeft() ||
           robot->isIRDetectFrontLeft() ||
           robot->isIRDetectCenterLeft()) {
         // turn right
@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
     else {
       robot->enableDebrisLED(false);
     }
-    
+
     // Check bumpers
     if (robot->isLeftBumper()) {
       std::cout << "left bump detected!" << std::endl;
@@ -110,13 +110,13 @@ int main(int argc, char** argv) {
   }
 
   std::cout << "Stopping Create." << std::endl;
- 
-  // Turn off lights 
+
+  // Turn off lights
   robot->setPowerLED(0, 0);
   robot->enableDebrisLED(false);
   robot->enableCheckRobotLED(false);
   robot->setDigitsASCII(' ', ' ', ' ', ' ');
-  
+
   // Make sure to disconnect to clean up
   robot->disconnect();
   delete robot;
