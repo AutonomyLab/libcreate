@@ -239,11 +239,11 @@ namespace create {
     return send(&oc, 1);
   }
 
-  uint64_t Serial::getNumCorruptPackets() {
+  uint64_t Serial::getNumCorruptPackets() const {
     return corruptPackets;
   }
 
-  uint64_t Serial::getNumTotalPackets() {
+  uint64_t Serial::getTotalPackets() const {
     return totalPackets;
   }
 } // namespace create

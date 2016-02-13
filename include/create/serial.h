@@ -97,8 +97,8 @@ namespace create {
       inline bool connected() const { return port.is_open(); };
       bool send(const uint8_t* bytes, const uint32_t numBytes);
       bool sendOpcode(const Opcode& code);
-      uint64_t getNumCorruptPackets();
-      uint64_t getNumTotalPackets();
+      uint64_t getNumCorruptPackets() const;
+      uint64_t getTotalPackets() const;
   };
 }  // namespace create
 

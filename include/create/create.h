@@ -357,6 +357,14 @@ namespace create {
       /* Get the estimated velocity of Create based on wheel encoders.
        */
       const create::Vel& getVel() const;
+
+      /* Get the number of corrupt serial packets since first connecting to Create.
+       */
+      uint64_t getNumCorruptPackets() const;
+
+      /* Get the total number of serial packets (including corrupt packets) since first connecting to Create.
+       */
+      uint64_t getTotalPackets() const;
   };  // end Create class
 
 }  // namespace create

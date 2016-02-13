@@ -22,7 +22,6 @@ target_link_libraries(create
 
 ## Declare example executables
 add_executable(create_demo examples/create_demo.cpp)
-add_executable(odom_test examples/odom_test.cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(create_demo
@@ -30,13 +29,7 @@ target_link_libraries(create_demo
   create
 )
 
-target_link_libraries(odom_test
-  ${Boost_LIBRARIES}
-  create
-)
-
 ## Install
-## I'm not familiar with install rules, do these make sense?
 install(TARGETS create DESTINATION lib)
 install(FILES
         include/create/create.h

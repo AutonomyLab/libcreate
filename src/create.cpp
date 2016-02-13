@@ -505,4 +505,12 @@ namespace create {
     return vel;
   }
 
+  uint64_t Create::getNumCorruptPackets() const {
+    return serial->getNumCorruptPackets();
+  }
+
+  uint64_t Create::getTotalPackets() const {
+    return serial->getTotalPackets();
+  }
+
 } // end namespace
