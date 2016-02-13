@@ -23,4 +23,10 @@ See source for examples.
  
 Example compile line: `g++ create_demo.cpp -lcreate -lboost_system -lboost_thread`
 
+## Bugs
+
+* _Clock_ and _Schedule_ button presses are not detected. This is a known problem to the developers at iRobot.
+
+## Build Status
+
 ![Build Status](https://api.travis-ci.org/AutonomyLab/libcreate.svg?branch=master)
