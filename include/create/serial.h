@@ -88,6 +88,8 @@ namespace create {
       // Start and stop reading data from Create
       bool startReading();
       void stopReading();
+      // Notifies main thread that data is fresh and makes the user callback
+      void notifyDataReady();
 
     public:
       Serial(boost::shared_ptr<Data> data, const uint8_t& header = create::util::CREATE_2_HEADER);

@@ -130,6 +130,24 @@ namespace create {
     }
   }
 
+
+  void Serial::notifyDataReady() {
+    // Validate all packets
+    data->validateAll();
+
+    // Notify first data packets ready
+    {
+      boost::lock_guard<boost::mutex> lock(dataReadyMut);
+      if (!dataReady) {
+        dataReady = true;
+        dataReadyCond.notify_one();
+      }
+    }
+    // Callback to notify data is ready
+    if (callback)
+      callback();
+  }
+
   void Serial::onData(const boost::system::error_code& e, const std::size_t& size) {
     if (e) {
       CERR("[create::Serial] ", "serial error - " << e.message());
@@ -153,8 +171,10 @@ namespace create {
             readState = READ_PACKET_ID;
             numBytesRead = 0;
           }
-          else
+          else {
+            //notifyDataReady();
             readState = READ_HEADER;
+          }
         break;
 
         case READ_PACKET_ID:
@@ -167,6 +187,7 @@ namespace create {
             readState = READ_PACKET_BYTES;
           }
           else {
+            //notifyDataReady();
             readState = READ_HEADER;
           }
         break;
@@ -192,20 +213,7 @@ namespace create {
 
         case READ_CHECKSUM:
           if ((byteSum & 0xFF) == 0) {
-            // Validate all packets
-            data->validateAll();
-
-            // Notify first data packets ready
-            {
-              boost::lock_guard<boost::mutex> lock(dataReadyMut);
-              if (!dataReady) {
-                dataReady = true;
-                dataReadyCond.notify_one();
-              }
-            }
-            // Callback to notify data is ready
-            if (callback)
-              callback();
+            notifyDataReady();
           }
           else {
             // Corrupt data
