@@ -33,6 +33,11 @@ POSSIBILITY OF SUCH DAMAGE.
 #define CREATE_TYPES_H
 
 namespace create {
+  enum RobotModel {
+    CREATE_1 = 0, // Roomba 400 series
+    CREATE_2      // Roomba 600 series 
+  };
+
   enum SensorPacketID {
     ID_GROUP_0 = 0,
     ID_GROUP_1 = 1,
