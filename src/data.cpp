@@ -28,10 +28,8 @@ namespace create {
     if (model == CREATE_1) {
       ADD_PACKET(ID_DISTANCE, 2, "distance");
       ADD_PACKET(ID_ANGLE, 2, "angle");
-      std::cout << "Adding Create 1 packets" << std::endl;
     }
     else if (model == CREATE_2) {
-      std::cout << "Adding Create 2 packets" << std::endl;
       //ADD_PACKET(ID_VIRTUAL_WALL, 1, "virtual_wall");
       //ADD_PACKET(ID_OVERCURRENTS, 1, "overcurrents");
       ADD_PACKET(ID_DIRT_DETECT, 1, "dirt_detect");
