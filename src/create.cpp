@@ -66,7 +66,7 @@ namespace create {
     float dt = (curTime - prevOnDataTime) / 1000000.0;
     float deltaDist, deltaX, deltaY, deltaYaw;
     if (model == CREATE_1) {
-      deltaDist = GET_DATA(ID_DISTANCE);
+      deltaDist = GET_DATA(ID_DISTANCE) / 1000.0; //mm -> m
       deltaYaw = GET_DATA(ID_ANGLE) * util::PI / 180.0; // D2R
       deltaX = deltaDist * cos(pose.yaw);
       deltaY = deltaDist * sin(pose.yaw);
