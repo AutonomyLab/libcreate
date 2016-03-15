@@ -26,6 +26,8 @@ namespace create {
     port.set_option(serial_port::baud_rate(baud));
     port.set_option(serial_port::flow_control(serial_port::flow_control::none));
 
+    usleep(1000000);
+
     if (port.is_open()) {
       callback = cb;
       bool startReadSuccess = startReading();

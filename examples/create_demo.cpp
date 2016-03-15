@@ -4,11 +4,19 @@ create::Create* robot;
 
 int main(int argc, char** argv) {
   std::string port = "/dev/ttyUSB0";
+  int baud = 115200;
+  create::RobotModel model = create::CREATE_2;
 
-  robot = new create::Create();
+  if (argc > 1 && std::string(argv[1]) == "create1") {
+    model = create::CREATE_1;
+    baud = 57600;
+    std::cout << "1st generation Create selected" << std::endl;
+  }
+
+  robot = new create::Create(model);
 
   // Attempt to connect to Create
-  if (robot->connect(port, 115200))
+  if (robot->connect(port, baud))
     std::cout << "Successfully connected to Create" << std::endl;
   else {
     std::cout << "Failed to connect to Create on port " << port.c_str() << std::endl;
@@ -31,7 +39,7 @@ int main(int argc, char** argv) {
   //for (int i = 0; i < songLength; i++) {
   //  durations[i] = 0.25;
   //}
-  //robot->createSong(0, songLength, notes, durations);
+  //robot->defineSong(0, songLength, notes, durations);
   //usleep(1000000);
   //robot->playSong(0);
 
