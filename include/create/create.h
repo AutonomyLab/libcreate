@@ -307,14 +307,15 @@ namespace create {
       uint16_t getVoltage() const;
 
       /* Get current flowing in/out of battery.
+       * A positive current implies Create is charging. 
        * \return value in milliamps
        */
-      uint16_t getCurrent() const;
+      int16_t getCurrent() const;
 
       /* Get the temperature of battery.
        * \return value in Celsius
        */
-      uint8_t getTemperature() const;
+      int8_t getTemperature() const;
 
       /* Get battery's remaining charge.
        * \return value in milliamp-hours

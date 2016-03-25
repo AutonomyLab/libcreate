@@ -577,9 +577,9 @@ namespace create {
     }
   }
 
-  uint16_t Create::getCurrent() const {
+  int16_t Create::getCurrent() const {
     if (data->isValidPacketID(ID_VOLTAGE)) {
-      return GET_DATA(ID_CURRENT);
+      return (int16_t) GET_DATA(ID_CURRENT);
     }
     else {
       CERR("[create::Create] ", "Current sensor not supported!");
@@ -587,9 +587,9 @@ namespace create {
     }
   }
 
-  uint8_t Create::getTemperature() const {
+  int8_t Create::getTemperature() const {
     if (data->isValidPacketID(ID_TEMP)) {
-      return GET_DATA(ID_TEMP);
+      return (int8_t) GET_DATA(ID_TEMP);
     }
     else {
       CERR("[create::Create] ", "Temperature sensor not supported!");
