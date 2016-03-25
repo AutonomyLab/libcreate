@@ -48,7 +48,7 @@ namespace create {
       std::vector<uint8_t> ids;
 
     public:
-      Data();
+      Data(RobotModel = CREATE_2);
       ~Data();
 
       bool isValidPacketID(const uint8_t id) const;

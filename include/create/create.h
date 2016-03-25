@@ -51,6 +51,8 @@ namespace create {
         LED_CHECK = 8
       };
 
+      RobotModel model;
+
       uint8_t mainMotorPower;
       uint8_t sideMotorPower;
       uint8_t vacuumMotorPower;
@@ -85,11 +87,11 @@ namespace create {
       /* Default constructor.
        * Does not attempt to establish serial connection to Create.
        */
-      Create();
+      Create(RobotModel = CREATE_2);
 
       /* Attempts to establish serial connection to Create.
        */
-      Create(const std::string& port, const int& baud);
+      Create(const std::string& port, const int& baud, RobotModel = CREATE_2);
 
       ~Create();
 

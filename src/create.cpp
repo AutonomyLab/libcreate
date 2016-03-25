@@ -33,15 +33,15 @@ namespace create {
     vel.x = 0;
     vel.y = 0;
     vel.yaw = 0;
-    data = boost::shared_ptr<Data>(new Data());
+    data = boost::shared_ptr<Data>(new Data(model));
     serial = boost::make_shared<Serial>(data);
   }
 
-  Create::Create() {
+  Create::Create(RobotModel m) : model(m) {
     init();
   }
 
-  Create::Create(const std::string& dev, const int& baud) {
+  Create::Create(const std::string& dev, const int& baud, RobotModel m) : model(m) {
     init();
     serial->connect(dev, baud);
   }
@@ -52,9 +52,11 @@ namespace create {
 
   void Create::onData() {
     if (firstOnData) {
-      // Initialize tick counts
-      prevTicksLeft = GET_DATA(ID_LEFT_ENC);
-      prevTicksRight = GET_DATA(ID_RIGHT_ENC);
+      if (model == CREATE_2) {
+        // Initialize tick counts
+        prevTicksLeft = GET_DATA(ID_LEFT_ENC);
+        prevTicksRight = GET_DATA(ID_RIGHT_ENC);
+      }
       prevOnDataTime = util::getTimestamp();
       firstOnData = false;
     }
@@ -62,67 +64,73 @@ namespace create {
     // Get current time
     util::timestamp_t curTime = util::getTimestamp();
     float dt = (curTime - prevOnDataTime) / 1000000.0;
-
-    // Get cumulative ticks (wraps around at 65535)
-    uint16_t totalTicksLeft = GET_DATA(ID_LEFT_ENC);
-    uint16_t totalTicksRight = GET_DATA(ID_RIGHT_ENC);
-    // Compute ticks since last update
-    int ticksLeft = totalTicksLeft - prevTicksLeft;
-    int ticksRight = totalTicksRight - prevTicksRight;
-    prevTicksLeft = totalTicksLeft;
-    prevTicksRight = totalTicksRight;
-
-    // Handle wrap around
-    if (fabs(ticksLeft) > 0.9 * util::CREATE_2_MAX_ENCODER_TICKS) {
-      ticksLeft = (ticksLeft % util::CREATE_2_MAX_ENCODER_TICKS) + 1;
-    }
-    if (fabs(ticksRight) > 0.9 * util::CREATE_2_MAX_ENCODER_TICKS) {
-      ticksRight = (ticksRight % util::CREATE_2_MAX_ENCODER_TICKS) + 1;
-    }
-
-    // Compute distance travelled by each wheel
-    float leftWheelDist = (ticksLeft / util::CREATE_2_TICKS_PER_REV)
-                           * util::CREATE_2_WHEEL_DIAMETER * util::PI;
-    float rightWheelDist = (ticksRight / util::CREATE_2_TICKS_PER_REV)
-                            * util::CREATE_2_WHEEL_DIAMETER * util::PI;
-
-    float wheelDistDiff = rightWheelDist - leftWheelDist;
-    float deltaDist = (rightWheelDist + leftWheelDist) / 2.0;
-
-    // Moving straight
-    float deltaX, deltaY;
-    if (fabs(wheelDistDiff) < util::EPS) {
+    float deltaDist, deltaX, deltaY, deltaYaw;
+    if (model == CREATE_1) {
+      deltaDist = GET_DATA(ID_DISTANCE) / 1000.0; //mm -> m
+      deltaYaw = GET_DATA(ID_ANGLE) * util::PI / 180.0; // D2R
       deltaX = deltaDist * cos(pose.yaw);
       deltaY = deltaDist * sin(pose.yaw);
-      vel.yaw = 0;
     }
-    else {
-      float turnRadius = (util::CREATE_2_AXLE_LENGTH / 2.0) * (leftWheelDist + rightWheelDist) / wheelDistDiff;
-      float deltaYaw = (rightWheelDist - leftWheelDist) / util::CREATE_2_AXLE_LENGTH;
-      deltaX = turnRadius * (sin(pose.yaw + deltaYaw) - sin(pose.yaw));
-      deltaY = turnRadius * (cos(pose.yaw + deltaYaw) - cos(pose.yaw));
-      pose.yaw = util::normalizeAngle(pose.yaw + deltaYaw);
-      if (fabs(dt) > util::EPS) {
-        vel.yaw = deltaYaw / dt;
+    else if (model == CREATE_2) {
+      // Get cumulative ticks (wraps around at 65535)
+      uint16_t totalTicksLeft = GET_DATA(ID_LEFT_ENC);
+      uint16_t totalTicksRight = GET_DATA(ID_RIGHT_ENC);
+      // Compute ticks since last update
+      int ticksLeft = totalTicksLeft - prevTicksLeft;
+      int ticksRight = totalTicksRight - prevTicksRight;
+      prevTicksLeft = totalTicksLeft;
+      prevTicksRight = totalTicksRight;
+
+      // Handle wrap around
+      if (fabs(ticksLeft) > 0.9 * util::CREATE_2_MAX_ENCODER_TICKS) {
+        ticksLeft = (ticksLeft % util::CREATE_2_MAX_ENCODER_TICKS) + 1;
+      }
+      if (fabs(ticksRight) > 0.9 * util::CREATE_2_MAX_ENCODER_TICKS) {
+        ticksRight = (ticksRight % util::CREATE_2_MAX_ENCODER_TICKS) + 1;
+      }
+
+      // Compute distance travelled by each wheel
+      float leftWheelDist = (ticksLeft / util::CREATE_2_TICKS_PER_REV)
+                             * util::CREATE_2_WHEEL_DIAMETER * util::PI;
+      float rightWheelDist = (ticksRight / util::CREATE_2_TICKS_PER_REV)
+                              * util::CREATE_2_WHEEL_DIAMETER * util::PI;
+
+      float wheelDistDiff = rightWheelDist - leftWheelDist;
+      deltaDist = (rightWheelDist + leftWheelDist) / 2.0;
+
+      // Moving straight
+      float deltaX, deltaY;
+      if (fabs(wheelDistDiff) < util::EPS) {
+        deltaX = deltaDist * cos(pose.yaw);
+        deltaY = deltaDist * sin(pose.yaw);
+        deltaYaw = 0.0;
+        //vel.yaw = 0;
       }
       else {
-        vel.yaw = 0;
+        float turnRadius = (util::CREATE_2_AXLE_LENGTH / 2.0) * (leftWheelDist + rightWheelDist) / wheelDistDiff;
+        deltaYaw = (rightWheelDist - leftWheelDist) / util::CREATE_2_AXLE_LENGTH;
+        deltaX = turnRadius * (sin(pose.yaw + deltaYaw) - sin(pose.yaw));
+        deltaY = turnRadius * (cos(pose.yaw + deltaYaw) - cos(pose.yaw));
       }
-    }
+    } // if CREATE_2
 
     if (fabs(dt) > util::EPS) {
       vel.x = deltaX / dt;
       vel.y = deltaY / dt;
+      vel.yaw = deltaYaw / dt;
     }
     else {
-      vel.x = 0;
-      vel.y = 0;
+      vel.x = 0.0;
+      vel.y = 0.0;
+      vel.yaw = 0.0;
     }
 
-    pose.x += deltaDist * cos(pose.yaw);
-    pose.y += deltaDist * sin(pose.yaw);
+    pose.x += deltaX;
+    pose.y += deltaY;
+    pose.yaw = util::normalizeAngle(pose.yaw + deltaYaw);
 
     prevOnDataTime = curTime;
+
     // Make user registered callbacks, if any
     // TODO
   }
@@ -370,131 +378,314 @@ namespace create {
   }
 
   bool Create::isWheeldrop() const {
-    return (GET_DATA(ID_BUMP_WHEELDROP) & 0x0C) != 0;
+    if (data->isValidPacketID(ID_BUMP_WHEELDROP)) {
+      return (GET_DATA(ID_BUMP_WHEELDROP) & 0x0C) != 0;
+    }
+    else {
+      CERR("[create::Create] ", "Wheeldrop sensor not supported!");
+      return false;
+    }
   }
 
   bool Create::isLeftBumper() const {
-    return (GET_DATA(ID_BUMP_WHEELDROP) & 0x02) != 0;
+    if (data->isValidPacketID(ID_BUMP_WHEELDROP)) {
+      return (GET_DATA(ID_BUMP_WHEELDROP) & 0x02) != 0;
+    }
+    else {
+      CERR("[create::Create] ", "Left bumper not supported!");
+      return false;
+    }
   }
 
   bool Create::isRightBumper() const {
-    return (GET_DATA(ID_BUMP_WHEELDROP) & 0x01) != 0;
+    if (data->isValidPacketID(ID_BUMP_WHEELDROP)) {
+      return (GET_DATA(ID_BUMP_WHEELDROP) & 0x01) != 0;
+    }
+    else {
+      CERR("[create::Create] ", "Right bumper not supported!");
+      return false;
+    }
   }
 
   bool Create::isWall() const {
-    return GET_DATA(ID_WALL) == 1;
+    if (data->isValidPacketID(ID_WALL)) {
+      return GET_DATA(ID_WALL) == 1;
+    }
+    else {
+      CERR("[create::Create] ", "Wall sensor not supported!");
+      return false;
+    }
   }
 
   bool Create::isCliff() const {
-    return GET_DATA(ID_CLIFF_LEFT) == 1 ||
-           GET_DATA(ID_CLIFF_FRONT_LEFT) == 1 ||
-           GET_DATA(ID_CLIFF_FRONT_RIGHT) == 1 ||
-           GET_DATA(ID_CLIFF_RIGHT) == 1;
+    if (data->isValidPacketID(ID_CLIFF_LEFT) &&
+        data->isValidPacketID(ID_CLIFF_FRONT_LEFT) &&
+        data->isValidPacketID(ID_CLIFF_FRONT_RIGHT) &&
+        data->isValidPacketID(ID_CLIFF_RIGHT)) {
+      return GET_DATA(ID_CLIFF_LEFT) == 1 ||
+             GET_DATA(ID_CLIFF_FRONT_LEFT) == 1 ||
+             GET_DATA(ID_CLIFF_FRONT_RIGHT) == 1 ||
+             GET_DATA(ID_CLIFF_RIGHT) == 1;
+    }
+    else {
+      CERR("[create::Create] ", "Cliff sensors not supported!");
+      return false;
+    }
   }
 
   uint8_t Create::getDirtDetect() const {
-    return GET_DATA(ID_DIRT_DETECT);
+    if (data->isValidPacketID(ID_DIRT_DETECT)) {
+      return GET_DATA(ID_DIRT_DETECT);
+    }
+    else {
+      CERR("[create::Create] ", "Dirt detector not supported!");
+      return -1;
+    }
   }
 
   uint8_t Create::getIROmni() const {
-    return GET_DATA(ID_IR_OMNI);
+    if (data->isValidPacketID(ID_IR_OMNI)) {
+      return GET_DATA(ID_IR_OMNI);
+    }
+    else {
+      CERR("[create::Create] ", "Omni IR sensor not supported!");
+      return -1;
+    }
   }
 
   uint8_t Create::getIRLeft() const {
-    return GET_DATA(ID_IR_LEFT);
+    if (data->isValidPacketID(ID_IR_LEFT)) {
+      return GET_DATA(ID_IR_LEFT);
+    }
+    else {
+      CERR("[create::Create] ", "Left IR sensor not supported!");
+      return -1;
+    }
   }
 
   uint8_t Create::getIRRight() const {
-    return GET_DATA(ID_IR_RIGHT);
+    if (data->isValidPacketID(ID_IR_RIGHT)) {
+      return GET_DATA(ID_IR_RIGHT);
+    }
+    else {
+      CERR("[create::Create] ", "Right IR sensor not supported!");
+      return -1;
+    }
   }
 
   ChargingState Create::getChargingState() const {
-    uint8_t chargeState = GET_DATA(ID_CHARGE_STATE);
-    assert(chargeState >= 0);
-    assert(chargeState <= 5);
-    return (ChargingState) chargeState;
+    if (data->isValidPacketID(ID_CHARGE_STATE)) {
+      uint8_t chargeState = GET_DATA(ID_CHARGE_STATE);
+      assert(chargeState >= 0);
+      assert(chargeState <= 5);
+      return (ChargingState) chargeState;
+    }
+    else {
+      CERR("[create::Create] ", "Charging state not supported!");
+      return CHARGE_FAULT;
+    }
   }
 
   bool Create::isCleanButtonPressed() const {
-    return (GET_DATA(ID_BUTTONS) & 0x01) != 0;
+    if (data->isValidPacketID(ID_BUTTONS)) {
+      return (GET_DATA(ID_BUTTONS) & 0x01) != 0;
+    }
+    else {
+      CERR("[create::Create] ", "Buttons not supported!");
+      return false;
+    }
   }
 
   // Not working
   bool Create::isClockButtonPressed() const {
-    return (GET_DATA(ID_BUTTONS) & 0x80) != 0;
+    if (data->isValidPacketID(ID_BUTTONS)) {
+      return (GET_DATA(ID_BUTTONS) & 0x80) != 0;
+    }
+    else {
+      CERR("[create::Create] ", "Buttons not supported!");
+      return false;
+    }
   }
 
   // Not working
   bool Create::isScheduleButtonPressed() const {
-    return (GET_DATA(ID_BUTTONS) & 0x40) != 0;
+    if (data->isValidPacketID(ID_BUTTONS)) {
+      return (GET_DATA(ID_BUTTONS) & 0x40) != 0;
+    }
+    else {
+      CERR("[create::Create] ", "Buttons not supported!");
+      return false;
+    }
   }
 
   bool Create::isDayButtonPressed() const {
-    return (GET_DATA(ID_BUTTONS) & 0x20) != 0;
+    if (data->isValidPacketID(ID_BUTTONS)) {
+      return (GET_DATA(ID_BUTTONS) & 0x20) != 0;
+    }
+    else {
+      CERR("[create::Create] ", "Buttons not supported!");
+      return false;
+    }
   }
 
   bool Create::isHourButtonPressed() const {
-    return (GET_DATA(ID_BUTTONS) & 0x10) != 0;
+    if (data->isValidPacketID(ID_BUTTONS)) {
+      return (GET_DATA(ID_BUTTONS) & 0x10) != 0;
+    }
+    else {
+      CERR("[create::Create] ", "Buttons not supported!");
+      return false;
+    }
   }
 
   bool Create::isMinButtonPressed() const {
-    return (GET_DATA(ID_BUTTONS) & 0x08) != 0;
+    if (data->isValidPacketID(ID_BUTTONS)) {
+      return (GET_DATA(ID_BUTTONS) & 0x08) != 0;
+    }
+    else {
+      CERR("[create::Create] ", "Buttons not supported!");
+      return false;
+    }
   }
 
   bool Create::isDockButtonPressed() const {
-    return (GET_DATA(ID_BUTTONS) & 0x04) != 0;
+    if (data->isValidPacketID(ID_BUTTONS)) {
+      return (GET_DATA(ID_BUTTONS) & 0x04) != 0;
+    }
+    else {
+      CERR("[create::Create] ", "Buttons not supported!");
+      return false;
+    }
   }
 
   bool Create::isSpotButtonPressed() const {
-    return (GET_DATA(ID_BUTTONS) & 0x02) != 0;
+    if (data->isValidPacketID(ID_BUTTONS)) {
+      return (GET_DATA(ID_BUTTONS) & 0x02) != 0;
+    }
+    else {
+      CERR("[create::Create] ", "Buttons not supported!");
+      return false;
+    }
   }
 
   uint16_t Create::getVoltage() const {
-    return GET_DATA(ID_VOLTAGE);
+    if (data->isValidPacketID(ID_VOLTAGE)) {
+      return GET_DATA(ID_VOLTAGE);
+    }
+    else {
+      CERR("[create::Create] ", "Voltage sensor not supported!");
+      return 0;
+    }
   }
 
   uint16_t Create::getCurrent() const {
-    return GET_DATA(ID_CURRENT);
+    if (data->isValidPacketID(ID_VOLTAGE)) {
+      return GET_DATA(ID_CURRENT);
+    }
+    else {
+      CERR("[create::Create] ", "Current sensor not supported!");
+      return 0;
+    }
   }
 
   uint8_t Create::getTemperature() const {
-    return GET_DATA(ID_TEMP);
+    if (data->isValidPacketID(ID_TEMP)) {
+      return GET_DATA(ID_TEMP);
+    }
+    else {
+      CERR("[create::Create] ", "Temperature sensor not supported!");
+      return 0;
+    }
   }
 
   uint16_t Create::getBatteryCharge() const {
-    return GET_DATA(ID_CHARGE);
+    if (data->isValidPacketID(ID_CHARGE)) {
+      return GET_DATA(ID_CHARGE);
+    }
+    else {
+      CERR("[create::Create] ", "Battery charge not supported!");
+      return 0;
+    }
   }
 
   uint16_t Create::getBatteryCapacity() const {
-    return GET_DATA(ID_CAPACITY);
+    if (data->isValidPacketID(ID_CAPACITY)) {
+      return GET_DATA(ID_CAPACITY);
+    }
+    else {
+      CERR("[create::Create] ", "Battery capacity not supported!");
+      return 0;
+    }
   }
 
   bool Create::isIRDetectLeft() const {
-    return (GET_DATA(ID_LIGHT) & 0x01) != 0;
+    if (data->isValidPacketID(ID_LIGHT)) {
+      return (GET_DATA(ID_LIGHT) & 0x01) != 0;
+    }
+    else {
+      CERR("[create::Create] ", "Light sensors not supported!");
+      return false;
+    }
   }
 
   bool Create::isIRDetectFrontLeft() const {
-    return (GET_DATA(ID_LIGHT) & 0x02) != 0;
+    if (data->isValidPacketID(ID_LIGHT)) {
+      return (GET_DATA(ID_LIGHT) & 0x02) != 0;
+    }
+    else {
+      CERR("[create::Create] ", "Light sensors not supported!");
+      return false;
+    }
   }
 
   bool Create::isIRDetectCenterLeft() const {
-    return (GET_DATA(ID_LIGHT) & 0x04) != 0;
+    if (data->isValidPacketID(ID_LIGHT)) {
+      return (GET_DATA(ID_LIGHT) & 0x04) != 0;
+    }
+    else {
+      CERR("[create::Create] ", "Light sensors not supported!");
+      return false;
+    }
   }
 
   bool Create::isIRDetectCenterRight() const {
-    return (GET_DATA(ID_LIGHT) & 0x08) != 0;
+    if (data->isValidPacketID(ID_LIGHT)) {
+      return (GET_DATA(ID_LIGHT) & 0x08) != 0;
+    }
+    else {
+      CERR("[create::Create] ", "Light sensors not supported!");
+      return false;
+    }
   }
 
   bool Create::isIRDetectFrontRight() const {
-    return (GET_DATA(ID_LIGHT) & 0x10) != 0;
+    if (data->isValidPacketID(ID_LIGHT)) {
+      return (GET_DATA(ID_LIGHT) & 0x10) != 0;
+    }
+    else {
+      CERR("[create::Create] ", "Light sensors not supported!");
+      return false;
+    }
   }
 
   bool Create::isIRDetectRight() const {
-    return (GET_DATA(ID_LIGHT) & 0x20) != 0;
+    if (data->isValidPacketID(ID_LIGHT)) {
+      return (GET_DATA(ID_LIGHT) & 0x20) != 0;
+    }
+    else {
+      CERR("[create::Create] ", "Light sensors not supported!");
+      return false;
+    }
   }
 
   bool Create::isMovingForward() const {
-    return GET_DATA(ID_STASIS) == 1;
+    if (data->isValidPacketID(ID_STASIS)) {
+      return GET_DATA(ID_STASIS) == 1;
+    }
+    else {
+      CERR("[create::Create] ", "Stasis sensor not supported!");
+      return false;
+    }
   }
 
   const Pose& Create::getPose() const {
