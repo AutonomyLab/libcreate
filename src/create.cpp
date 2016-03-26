@@ -99,7 +99,6 @@ namespace create {
       deltaDist = (rightWheelDist + leftWheelDist) / 2.0;
 
       // Moving straight
-      float deltaX, deltaY;
       if (fabs(wheelDistDiff) < util::EPS) {
         deltaX = deltaDist * cos(pose.yaw);
         deltaY = deltaDist * sin(pose.yaw);
