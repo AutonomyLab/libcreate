@@ -687,6 +687,16 @@ namespace create {
     }
   }
 
+  create::CreateMode Create::getMode() const {
+    if (data->isValidPacketID(ID_OI_MODE)) {
+      return (create::CreateMode) GET_DATA(ID_OI_MODE);
+    }
+    else {
+      CERR("[create::Create] ", "Querying Mode not supported!");
+      return create::MODE_UNAVAILABLE;
+    }
+  }
+
   const Pose& Create::getPose() const {
     return pose;
   }

@@ -80,7 +80,7 @@ namespace create {
     ID_UNUSED_2 = 32,
     ID_UNUSED_3 = 33,
     ID_CHARGE_SOURCE = 34,
-    ID_IO_MODE = 35,
+    ID_OI_MODE = 35,
     ID_SONG_NUM = 36,
     ID_PLAYING = 37,
     ID_NUM_STREAM_PACKETS = 38,
@@ -156,7 +156,8 @@ namespace create {
     MODE_OFF = OC_POWER,
     MODE_PASSIVE = OC_START,
     MODE_SAFE = OC_SAFE,
-    MODE_FULL = OC_FULL
+    MODE_FULL = OC_FULL,
+    MODE_UNAVAILABLE = -1
   };
 
   enum CleanMode {
