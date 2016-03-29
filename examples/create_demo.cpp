@@ -72,16 +72,16 @@ int main(int argc, char** argv) {
     // If everything is ok, drive forward using IR's to avoid obstacles
     if (drive) {
       robot->setPowerLED(0); // green
-      if (robot->isIRDetectLeft() ||
-          robot->isIRDetectFrontLeft() ||
-          robot->isIRDetectCenterLeft()) {
+      if (robot->isLightBumperLeft() ||
+          robot->isLightBumperFrontLeft() ||
+          robot->isLightBumperCenterLeft()) {
         // turn right
         robot->drive(0.1, -1.0);
         robot->setDigitsASCII('-','-','-',']');
       }
-      else if (robot->isIRDetectRight() ||
-               robot->isIRDetectFrontRight() ||
-               robot->isIRDetectCenterRight()) {
+      else if (robot->isLightBumperRight() ||
+               robot->isLightBumperFrontRight() ||
+               robot->isLightBumperCenterRight()) {
         // turn left
         robot->drive(0.1, 1.0);
         robot->setDigitsASCII('[','-','-','-');

@@ -24,13 +24,13 @@ namespace create {
     ADD_PACKET(ID_TEMP, 1, "temperature");
     ADD_PACKET(ID_CHARGE , 2, "battery_charge");
     ADD_PACKET(ID_CAPACITY, 2, "battery_capacity");
+    ADD_PACKET(ID_VIRTUAL_WALL, 1, "virtual_wall");
 
     if (model == CREATE_1) {
       ADD_PACKET(ID_DISTANCE, 2, "distance");
       ADD_PACKET(ID_ANGLE, 2, "angle");
     }
     else if (model == CREATE_2) {
-      //ADD_PACKET(ID_VIRTUAL_WALL, 1, "virtual_wall");
       //ADD_PACKET(ID_OVERCURRENTS, 1, "overcurrents");
       ADD_PACKET(ID_DIRT_DETECT, 1, "dirt_detect");
       //ADD_PACKET(ID_UNUSED_1, 1, "unused 1");
