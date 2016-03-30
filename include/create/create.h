@@ -354,15 +354,15 @@ namespace create {
       bool isSpotButtonPressed() const;
 
       /* Get battery voltage.
-       * \return value in millivolts
+       * \return value in volts
        */
-      uint16_t getVoltage() const;
+      float getVoltage() const;
 
       /* Get current flowing in/out of battery.
        * A positive current implies Create is charging.
-       * \return value in milliamps
+       * \return value in amps
        */
-      int16_t getCurrent() const;
+      float getCurrent() const;
 
       /* Get the temperature of battery.
        * \return value in Celsius
@@ -370,14 +370,14 @@ namespace create {
       int8_t getTemperature() const;
 
       /* Get battery's remaining charge.
-       * \return value in milliamp-hours
+       * \return value in amp-hours
        */
-      uint16_t getBatteryCharge() const;
+      float getBatteryCharge() const;
 
       /* Get estimated battery charge capacity.
-       * \return in milliamp-hours
+       * \return in amp-hours
        */
-      uint16_t getBatteryCapacity() const;
+      float getBatteryCapacity() const;
 
       /* Return true if farthest left light sensor detects an obstacle, false otherwise.
        */

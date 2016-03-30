@@ -567,9 +567,9 @@ namespace create {
     }
   }
 
-  uint16_t Create::getVoltage() const {
+  float Create::getVoltage() const {
     if (data->isValidPacketID(ID_VOLTAGE)) {
-      return GET_DATA(ID_VOLTAGE);
+      return (GET_DATA(ID_VOLTAGE) / 1000.0);
     }
     else {
       CERR("[create::Create] ", "Voltage sensor not supported!");
@@ -577,9 +577,9 @@ namespace create {
     }
   }
 
-  int16_t Create::getCurrent() const {
+  float Create::getCurrent() const {
     if (data->isValidPacketID(ID_VOLTAGE)) {
-      return (int16_t) GET_DATA(ID_CURRENT);
+      return (((int16_t)GET_DATA(ID_CURRENT)) / 1000.0);
     }
     else {
       CERR("[create::Create] ", "Current sensor not supported!");
@@ -597,9 +597,9 @@ namespace create {
     }
   }
 
-  uint16_t Create::getBatteryCharge() const {
+  float Create::getBatteryCharge() const {
     if (data->isValidPacketID(ID_CHARGE)) {
-      return GET_DATA(ID_CHARGE);
+      return (GET_DATA(ID_CHARGE) / 1000.0);
     }
     else {
       CERR("[create::Create] ", "Battery charge not supported!");
@@ -607,9 +607,9 @@ namespace create {
     }
   }
 
-  uint16_t Create::getBatteryCapacity() const {
+  float Create::getBatteryCapacity() const {
     if (data->isValidPacketID(ID_CAPACITY)) {
-      return GET_DATA(ID_CAPACITY);
+      return (GET_DATA(ID_CAPACITY) / 1000.0);
     }
     else {
       CERR("[create::Create] ", "Battery capacity not supported!");
