@@ -24,13 +24,14 @@ namespace create {
     ADD_PACKET(ID_TEMP, 1, "temperature");
     ADD_PACKET(ID_CHARGE , 2, "battery_charge");
     ADD_PACKET(ID_CAPACITY, 2, "battery_capacity");
+    ADD_PACKET(ID_VIRTUAL_WALL, 1, "virtual_wall");
+    ADD_PACKET(ID_OI_MODE, 1, "oi_mode");
 
     if (model == CREATE_1) {
       ADD_PACKET(ID_DISTANCE, 2, "distance");
       ADD_PACKET(ID_ANGLE, 2, "angle");
     }
     else if (model == CREATE_2) {
-      //ADD_PACKET(ID_VIRTUAL_WALL, 1, "virtual_wall");
       //ADD_PACKET(ID_OVERCURRENTS, 1, "overcurrents");
       ADD_PACKET(ID_DIRT_DETECT, 1, "dirt_detect");
       //ADD_PACKET(ID_UNUSED_1, 1, "unused 1");
@@ -42,7 +43,6 @@ namespace create {
       //ADD_PACKET(ID_UNUSED_2, 1, "unused 2");
       //ADD_PACKET(ID_UNUSED_3, 2, "unused 3");
       //ADD_PACKET(ID_CHARGE_SOURCE, 1, "charger_available");
-      //ADD_PACKET(ID_IO_MODE, 1, "oi_mode");
       //ADD_PACKET(ID_SONG_NUM, 1, "song_number");
       //ADD_PACKET(ID_PLAYING, 1, "song_playing");
       //ADD_PACKET(ID_NUM_STREAM_PACKETS, 1, "oi_stream_num_packets");

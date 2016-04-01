@@ -46,6 +46,9 @@ namespace create {
     static const uint32_t CREATE_2_MAX_ENCODER_TICKS = 65535;
     static const float CREATE_2_WHEEL_DIAMETER = 0.078;
     static const float CREATE_2_MAX_VEL = 0.5;
+    static const float CREATE_2_MAX_RADIUS = 2.0;
+    static const float CREATE_2_STRAIGHT_RADIUS = 32.768;
+    static const float CREATE_2_IN_PLACE_RADUIS = 0.001;
     static const float PI = 3.14159;
     static const float TWO_PI = 6.28318;
     static const float EPS = 0.0001;

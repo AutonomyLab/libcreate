@@ -66,10 +66,10 @@ namespace create {
     float dt = (curTime - prevOnDataTime) / 1000000.0;
     float deltaDist, deltaX, deltaY, deltaYaw;
     if (model == CREATE_1) {
-      deltaDist = GET_DATA(ID_DISTANCE) / 1000.0; //mm -> m
-      deltaYaw = GET_DATA(ID_ANGLE) * util::PI / 180.0; // D2R
-      deltaX = deltaDist * cos(pose.yaw);
-      deltaY = deltaDist * sin(pose.yaw);
+      deltaDist = ((int16_t) GET_DATA(ID_DISTANCE)) / 1000.0; //mm -> m
+      deltaYaw = ((int16_t) GET_DATA(ID_ANGLE)) * (util::PI / 180.0); // D2R
+      deltaX = deltaDist * cos( util::normalizeAngle(pose.yaw + deltaYaw) );
+      deltaY = deltaDist * sin( util::normalizeAngle(pose.yaw + deltaYaw) );
     }
     else if (model == CREATE_2) {
       // Get cumulative ticks (wraps around at 65535)
@@ -188,16 +188,16 @@ namespace create {
     return serial->send(cmd, 4);
   }
 
-  /*void Create::driveRadius(const float& vel, const float& radius) const {
+  bool Create::driveRadius(const float& vel, const float& radius) const {
     // Expects each parameter as two bytes each and in millimeters
     int16_t vel_mm = roundf(vel * 1000);
     int16_t radius_mm = roundf(radius * 1000);
-    BOUND(vel_mm, -500, 500);
+    BOUND(vel_mm, -util::CREATE_2_MAX_VEL * 1000, util::CREATE_2_MAX_VEL * 1000);
 
-    // Consider special cases for radius
+    // Bound radius if not a special case
     if (radius_mm != 32768 && radius_mm != 32767 &&
         radius_mm != -1 && radius_mm != 1) {
-      BOUND(radius_mm, -2000, 2000);
+      BOUND(radius_mm, -util::CREATE_2_MAX_RADIUS, util::CREATE_2_MAX_RADIUS);
     }
 
     uint8_t cmd[5] = { OC_DRIVE,
@@ -207,9 +207,8 @@ namespace create {
                        radius_mm & 0xff
                      };
 
-    serial->send(cmd, 5);
+    return serial->send(cmd, 5);
   }
-  */
 
   bool Create::driveWheels(const float& leftVel, const float& rightVel) const {
     int16_t leftCmd = roundf(leftVel * 1000);
@@ -225,17 +224,6 @@ namespace create {
                      };
     return serial->send(cmd, 5);
   }
-
-  /*void Create::drivePWM(const int16_t& leftPWM, const int16_t& rightPWM) const {
-    uint8_t cmd[5] = { OC_DRIVE_PWM,
-                       rightPWM >> 8,
-                       rightPWM & 0xff,
-                       leftPWM >> 8,
-                       leftPWM & 0xff
-                     };
-    serial->send(cmd, 5);
-  }
-  */
 
   bool Create::drive(const float& xVel, const float& angularVel) const {
     // Compute left and right wheel velocities
@@ -432,6 +420,16 @@ namespace create {
     }
   }
 
+  bool Create::isVirtualWall() const {
+    if (data->isValidPacketID(ID_VIRTUAL_WALL)) {
+      return GET_DATA(ID_VIRTUAL_WALL);
+    }
+    else {
+      CERR("[create::Create] ", "Virtual Wall sensor not supported!");
+      return false;
+    }
+  }
+
   uint8_t Create::getDirtDetect() const {
     if (data->isValidPacketID(ID_DIRT_DETECT)) {
       return GET_DATA(ID_DIRT_DETECT);
@@ -495,8 +493,9 @@ namespace create {
     }
   }
 
-  // Not working
+  // Not supported by any 600 series firmware
   bool Create::isClockButtonPressed() const {
+    CERR("[create::Create] ", "Clock button is not supported!");
     if (data->isValidPacketID(ID_BUTTONS)) {
       return (GET_DATA(ID_BUTTONS) & 0x80) != 0;
     }
@@ -506,8 +505,9 @@ namespace create {
     }
   }
 
-  // Not working
+  // Not supported by any 600 series firmware
   bool Create::isScheduleButtonPressed() const {
+    CERR("[create::Create] ", "Schedule button is not supported!");
     if (data->isValidPacketID(ID_BUTTONS)) {
       return (GET_DATA(ID_BUTTONS) & 0x40) != 0;
     }
@@ -567,9 +567,9 @@ namespace create {
     }
   }
 
-  uint16_t Create::getVoltage() const {
+  float Create::getVoltage() const {
     if (data->isValidPacketID(ID_VOLTAGE)) {
-      return GET_DATA(ID_VOLTAGE);
+      return (GET_DATA(ID_VOLTAGE) / 1000.0);
     }
     else {
       CERR("[create::Create] ", "Voltage sensor not supported!");
@@ -577,9 +577,9 @@ namespace create {
     }
   }
 
-  uint16_t Create::getCurrent() const {
+  float Create::getCurrent() const {
     if (data->isValidPacketID(ID_VOLTAGE)) {
-      return GET_DATA(ID_CURRENT);
+      return (((int16_t)GET_DATA(ID_CURRENT)) / 1000.0);
     }
     else {
       CERR("[create::Create] ", "Current sensor not supported!");
@@ -587,9 +587,9 @@ namespace create {
     }
   }
 
-  uint8_t Create::getTemperature() const {
+  int8_t Create::getTemperature() const {
     if (data->isValidPacketID(ID_TEMP)) {
-      return GET_DATA(ID_TEMP);
+      return (int8_t) GET_DATA(ID_TEMP);
     }
     else {
       CERR("[create::Create] ", "Temperature sensor not supported!");
@@ -597,9 +597,9 @@ namespace create {
     }
   }
 
-  uint16_t Create::getBatteryCharge() const {
+  float Create::getBatteryCharge() const {
     if (data->isValidPacketID(ID_CHARGE)) {
-      return GET_DATA(ID_CHARGE);
+      return (GET_DATA(ID_CHARGE) / 1000.0);
     }
     else {
       CERR("[create::Create] ", "Battery charge not supported!");
@@ -607,9 +607,9 @@ namespace create {
     }
   }
 
-  uint16_t Create::getBatteryCapacity() const {
+  float Create::getBatteryCapacity() const {
     if (data->isValidPacketID(ID_CAPACITY)) {
-      return GET_DATA(ID_CAPACITY);
+      return (GET_DATA(ID_CAPACITY) / 1000.0);
     }
     else {
       CERR("[create::Create] ", "Battery capacity not supported!");
@@ -617,7 +617,7 @@ namespace create {
     }
   }
 
-  bool Create::isIRDetectLeft() const {
+  bool Create::isLightBumperLeft() const {
     if (data->isValidPacketID(ID_LIGHT)) {
       return (GET_DATA(ID_LIGHT) & 0x01) != 0;
     }
@@ -627,7 +627,7 @@ namespace create {
     }
   }
 
-  bool Create::isIRDetectFrontLeft() const {
+  bool Create::isLightBumperFrontLeft() const {
     if (data->isValidPacketID(ID_LIGHT)) {
       return (GET_DATA(ID_LIGHT) & 0x02) != 0;
     }
@@ -637,7 +637,7 @@ namespace create {
     }
   }
 
-  bool Create::isIRDetectCenterLeft() const {
+  bool Create::isLightBumperCenterLeft() const {
     if (data->isValidPacketID(ID_LIGHT)) {
       return (GET_DATA(ID_LIGHT) & 0x04) != 0;
     }
@@ -647,7 +647,7 @@ namespace create {
     }
   }
 
-  bool Create::isIRDetectCenterRight() const {
+  bool Create::isLightBumperCenterRight() const {
     if (data->isValidPacketID(ID_LIGHT)) {
       return (GET_DATA(ID_LIGHT) & 0x08) != 0;
     }
@@ -657,7 +657,7 @@ namespace create {
     }
   }
 
-  bool Create::isIRDetectFrontRight() const {
+  bool Create::isLightBumperFrontRight() const {
     if (data->isValidPacketID(ID_LIGHT)) {
       return (GET_DATA(ID_LIGHT) & 0x10) != 0;
     }
@@ -667,7 +667,7 @@ namespace create {
     }
   }
 
-  bool Create::isIRDetectRight() const {
+  bool Create::isLightBumperRight() const {
     if (data->isValidPacketID(ID_LIGHT)) {
       return (GET_DATA(ID_LIGHT) & 0x20) != 0;
     }
@@ -684,6 +684,16 @@ namespace create {
     else {
       CERR("[create::Create] ", "Stasis sensor not supported!");
       return false;
+    }
+  }
+
+  create::CreateMode Create::getMode() const {
+    if (data->isValidPacketID(ID_OI_MODE)) {
+      return (create::CreateMode) GET_DATA(ID_OI_MODE);
+    }
+    else {
+      CERR("[create::Create] ", "Querying Mode not supported!");
+      return create::MODE_UNAVAILABLE;
     }
   }
 
