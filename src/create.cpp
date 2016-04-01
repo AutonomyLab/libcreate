@@ -677,6 +677,66 @@ namespace create {
     }
   }
 
+  uint16_t Create::getLightSignalLeft() const {
+    if (data->isValidPacketID(ID_LIGHT_LEFT)) {
+      return GET_DATA(ID_LIGHT_LEFT);
+    }
+    else {
+      CERR("[create::Create] ", "Light sensors not supported!");
+      return 0;
+    }
+  }
+
+  uint16_t Create::getLightSignalFrontLeft() const {
+    if (data->isValidPacketID(ID_LIGHT_FRONT_LEFT)) {
+      return GET_DATA(ID_LIGHT_FRONT_LEFT);
+    }
+    else {
+      CERR("[create::Create] ", "Light sensors not supported!");
+      return 0;
+    }
+  }
+
+  uint16_t Create::getLightSignalCenterLeft() const {
+    if (data->isValidPacketID(ID_LIGHT_CENTER_LEFT)) {
+      return GET_DATA(ID_LIGHT_CENTER_LEFT);
+    }
+    else {
+      CERR("[create::Create] ", "Light sensors not supported!");
+      return 0;
+    }
+  }
+
+  uint16_t Create::getLightSignalRight() const {
+    if (data->isValidPacketID(ID_LIGHT_RIGHT)) {
+      return GET_DATA(ID_LIGHT_RIGHT);
+    }
+    else {
+      CERR("[create::Create] ", "Light sensors not supported!");
+      return 0;
+    }
+  }
+
+  uint16_t Create::getLightSignalFrontRight() const {
+    if (data->isValidPacketID(ID_LIGHT_FRONT_RIGHT)) {
+      return GET_DATA(ID_LIGHT_FRONT_RIGHT);
+    }
+    else {
+      CERR("[create::Create] ", "Light sensors not supported!");
+      return 0;
+    }
+  }
+
+  uint16_t Create::getLightSignalCenterRight() const {
+    if (data->isValidPacketID(ID_LIGHT_CENTER_RIGHT)) {
+      return GET_DATA(ID_LIGHT_CENTER_RIGHT);
+    }
+    else {
+      CERR("[create::Create] ", "Light sensors not supported!");
+      return 0;
+    }
+  }
+
   bool Create::isMovingForward() const {
     if (data->isValidPacketID(ID_STASIS)) {
       return GET_DATA(ID_STASIS) == 1;
