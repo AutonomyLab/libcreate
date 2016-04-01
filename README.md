@@ -1,8 +1,9 @@
 # libcreate
 
-C++ library for interfacing with iRobot's [Create 1 & 2](http://www.irobot.com/About-iRobot/STEM/Create-2.aspx). This library forms the basis of the ROS driver in [create_autonomy](https://github.com/autonomylab/create_autonomy).
+C++ library for interfacing with iRobot's [Create 1 and 2](http://www.irobot.com/About-iRobot/STEM/Create-2.aspx). This library forms the basis of the ROS driver in [create_autonomy](https://github.com/autonomylab/create_autonomy).
 
 * Documentation: TODO
+* Code API: TODO
 * Author: [Jacob Perron](http://jacobperron.ca) ([Autonomy Lab](http://autonomylab.org), [Simon Fraser University](http://www.sfu.ca))
 * Contributors: [Mani Monajjemi](http:mani.im)
 
