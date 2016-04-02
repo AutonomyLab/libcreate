@@ -53,12 +53,12 @@ namespace create {
       ADD_PACKET(ID_LEFT_ENC, 2, "enc_counts_left");
       ADD_PACKET(ID_RIGHT_ENC, 2, "enc_counts_right");
       ADD_PACKET(ID_LIGHT, 1, "light_bumper");
-      //ADD_PACKET(ID_LIGHT_LEFT, 2, "light_bumper_left");
-      //ADD_PACKET(ID_LIGHT_FRONT_LEFT, 2, "light_bumper_front_left");
-      //ADD_PACKET(ID_LIGHT_CENTER_LEFT, 2, "light_bumper_center_left");
-      //ADD_PACKET(ID_LIGHT_CENTER_RIGHT, 2, "light_bumper_center_right");
-      //ADD_PACKET(ID_LIGHT_FRONT_RIGHT, 2, "light_bumper_front_right");
-      //ADD_PACKET(ID_LIGHT_RIGHT, 2, "light_bumper_right");
+      ADD_PACKET(ID_LIGHT_LEFT, 2, "light_bumper_left");
+      ADD_PACKET(ID_LIGHT_FRONT_LEFT, 2, "light_bumper_front_left");
+      ADD_PACKET(ID_LIGHT_CENTER_LEFT, 2, "light_bumper_center_left");
+      ADD_PACKET(ID_LIGHT_CENTER_RIGHT, 2, "light_bumper_center_right");
+      ADD_PACKET(ID_LIGHT_FRONT_RIGHT, 2, "light_bumper_front_right");
+      ADD_PACKET(ID_LIGHT_RIGHT, 2, "light_bumper_right");
       ADD_PACKET(ID_IR_LEFT, 1, "ir_opcode_left");
       ADD_PACKET(ID_IR_RIGHT, 1, "ir_opcode_right");
       //ADD_PACKET(ID_LEFT_MOTOR_CURRENT, 2, "left_motor_current");

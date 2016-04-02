@@ -403,13 +403,35 @@ namespace create {
        */
       bool isLightBumperCenterRight() const;
 
-      //TODO (https://github.com/AutonomyLab/libcreate/issues/3)
-      //uint16_t getDistLeft() const;
-      //uint16_t getDistFrontLeft() const;
-      //uint16_t getDistCenterLeft() const;
-      //uint16_t getDistRight() const;
-      //uint16_t getDistFrontRight() const;
-      //uint16_t getDistCenterRight() const;
+      /* Return the signal strength from the left light sensor.
+       * \return value in range [0, 4095]
+       */
+      uint16_t getLightSignalLeft() const;
+
+      /* Return the signal strength from the front-left light sensor.
+       * \return value in range [0, 4095]
+       */
+      uint16_t getLightSignalFrontLeft() const;
+
+      /* Return the signal strength from the center-left light sensor.
+       * \return value in range [0, 4095]
+       */
+      uint16_t getLightSignalCenterLeft() const;
+
+      /* Return the signal strength from the right light sensor.
+       * \return value in range [0, 4095]
+       */
+      uint16_t getLightSignalRight() const;
+
+      /* Return the signal strength from the front-right light sensor.
+       * \return value in range [0, 4095]
+       */
+      uint16_t getLightSignalFrontRight() const;
+
+      /* Return the signal strength from the center-right light sensor.
+       * \return value in range [0, 4095]
+       */
+      uint16_t getLightSignalCenterRight() const;
 
       /* Return true if Create is moving forward, false otherwise.
        */
