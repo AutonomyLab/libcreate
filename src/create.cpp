@@ -66,10 +66,15 @@ namespace create {
     float dt = (curTime - prevOnDataTime) / 1000000.0;
     float deltaDist, deltaX, deltaY, deltaYaw;
     if (model == CREATE_1) {
+      /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+       * Angle returned is NOT correct if your robot is using older firmware:      *
+       * http://answers.ros.org/question/31935/createroomba-odometry/              *
+       * TODO: Consider using velocity command as substitute for pose estimation.  *
+       * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
       deltaDist = ((int16_t) GET_DATA(ID_DISTANCE)) / 1000.0; //mm -> m
       deltaYaw = ((int16_t) GET_DATA(ID_ANGLE)) * (util::PI / 180.0); // D2R
       deltaX = deltaDist * cos( util::normalizeAngle(pose.yaw + deltaYaw) );
-      deltaY = deltaDist * sin( util::normalizeAngle(pose.yaw + deltaYaw) );
+      deltaY = -deltaDist * sin( util::normalizeAngle(pose.yaw + deltaYaw) );
     }
     else if (model == CREATE_2) {
       // Get cumulative ticks (wraps around at 65535)
@@ -103,13 +108,12 @@ namespace create {
         deltaX = deltaDist * cos(pose.yaw);
         deltaY = deltaDist * sin(pose.yaw);
         deltaYaw = 0.0;
-        //vel.yaw = 0;
       }
       else {
         float turnRadius = (util::CREATE_2_AXLE_LENGTH / 2.0) * (leftWheelDist + rightWheelDist) / wheelDistDiff;
-        deltaYaw = (rightWheelDist - leftWheelDist) / util::CREATE_2_AXLE_LENGTH;
+        deltaYaw = wheelDistDiff / util::CREATE_2_AXLE_LENGTH;
         deltaX = turnRadius * (sin(pose.yaw + deltaYaw) - sin(pose.yaw));
-        deltaY = turnRadius * (cos(pose.yaw + deltaYaw) - cos(pose.yaw));
+        deltaY = -turnRadius * (cos(pose.yaw + deltaYaw) - cos(pose.yaw));
       }
     } // if CREATE_2
 
