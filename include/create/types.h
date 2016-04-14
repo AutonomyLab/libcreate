@@ -153,10 +153,10 @@ namespace create {
   };
 
   enum CreateMode {
-    MODE_OFF = OC_POWER,
-    MODE_PASSIVE = OC_START,
-    MODE_SAFE = OC_SAFE,
-    MODE_FULL = OC_FULL,
+    MODE_OFF = 0,
+    MODE_PASSIVE = 1,
+    MODE_SAFE = 2,
+    MODE_FULL = 3,
     MODE_UNAVAILABLE = -1
   };
 
@@ -226,6 +226,7 @@ namespace create {
     float x;
     float y;
     float yaw;
+    float covariance[9];
   };
 
   typedef Pose Vel;
