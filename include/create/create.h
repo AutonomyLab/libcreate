@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #define CREATE_H
 
 #include <boost/shared_ptr.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
 #include <string>
 #include <unistd.h>
 
@@ -44,6 +45,8 @@ POSSIBILITY OF SUCH DAMAGE.
 namespace create {
   class Create {
     private:
+      typedef boost::numeric::ublas::matrix<float> Matrix;
+
       enum CreateLED {
         LED_DEBRIS = 1,
         LED_SPOT = 2,
@@ -74,6 +77,8 @@ namespace create {
       float prevRightVel;
       bool firstOnData;
       util::timestamp_t prevOnDataTime;
+
+      Matrix poseCovar;
 
       void init();
       bool updateLEDs();

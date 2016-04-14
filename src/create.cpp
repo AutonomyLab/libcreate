@@ -12,6 +12,7 @@
 
 namespace create {
 
+
   // TODO: Handle SIGINT to do clean disconnect
 
   void Create::init() {
@@ -64,7 +65,7 @@ namespace create {
     // Get current time
     util::timestamp_t curTime = util::getTimestamp();
     float dt = (curTime - prevOnDataTime) / 1000000.0;
-    float deltaDist, deltaX, deltaY, deltaYaw;
+    float deltaDist, deltaX, deltaY, deltaYaw, leftWheelDist, rightWheelDist;
     if (model == CREATE_1) {
       /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
        * Angle returned is NOT correct if your robot is using older firmware:      *
@@ -75,6 +76,9 @@ namespace create {
       deltaYaw = ((int16_t) GET_DATA(ID_ANGLE)) * (util::PI / 180.0); // D2R
       deltaX = deltaDist * cos( util::normalizeAngle(pose.yaw + deltaYaw) );
       deltaY = -deltaDist * sin( util::normalizeAngle(pose.yaw + deltaYaw) );
+      leftWheelDist = deltaDist / 2.0;
+      rightWheelDist = leftWheelDist;
+
     }
     else if (model == CREATE_2) {
       // Get cumulative ticks (wraps around at 65535)
@@ -95,10 +99,10 @@ namespace create {
       }
 
       // Compute distance travelled by each wheel
-      float leftWheelDist = (ticksLeft / util::CREATE_2_TICKS_PER_REV)
-                             * util::CREATE_2_WHEEL_DIAMETER * util::PI;
-      float rightWheelDist = (ticksRight / util::CREATE_2_TICKS_PER_REV)
-                              * util::CREATE_2_WHEEL_DIAMETER * util::PI;
+      leftWheelDist = (ticksLeft / util::CREATE_2_TICKS_PER_REV)
+                       * util::CREATE_2_WHEEL_DIAMETER * util::PI;
+      rightWheelDist = (ticksRight / util::CREATE_2_TICKS_PER_REV)
+                        * util::CREATE_2_WHEEL_DIAMETER * util::PI;
 
       float wheelDistDiff = rightWheelDist - leftWheelDist;
       deltaDist = (rightWheelDist + leftWheelDist) / 2.0;
@@ -128,6 +132,71 @@ namespace create {
       vel.yaw = 0.0;
     }
 
+
+    // Update covariances
+    // Ref: "Introduction to Autonomous Mobile Robots" (Siegwart 2004, page 189)
+    float kr = 1.0; // TODO: Perform experiments to find these nondeterministic parameters
+    float kl = 1.0;
+    float cosYawAndHalfDelta = cos(pose.yaw + (deltaYaw / 2.0));
+    float sinYawAndHalfDelta = sin(pose.yaw + (deltaYaw / 2.0));
+    float distOverTwoWB = deltaDist / (util::CREATE_2_AXLE_LENGTH * 2.0);
+
+    Matrix invCovar(2, 2);
+    invCovar(0, 0) = kr * fabs(rightWheelDist);
+    invCovar(0, 1) = 0.0;
+    invCovar(1, 0) = 0.0;
+    invCovar(1, 1) = kl * fabs(leftWheelDist);
+
+    Matrix Finc(3, 2);
+    Finc(0, 0) = (cosYawAndHalfDelta / 2.0) - (distOverTwoWB * sinYawAndHalfDelta);
+    Finc(0, 1) = (cosYawAndHalfDelta / 2.0) + (distOverTwoWB * sinYawAndHalfDelta);
+    Finc(1, 0) = (sinYawAndHalfDelta / 2.0) + (distOverTwoWB * cosYawAndHalfDelta);
+    Finc(1, 1) = (sinYawAndHalfDelta / 2.0) - (distOverTwoWB * cosYawAndHalfDelta);
+    Finc(2, 0) = (1.0 / util::CREATE_2_AXLE_LENGTH);
+    Finc(2, 1) = (-1.0 / util::CREATE_2_AXLE_LENGTH);
+    Matrix FincT = boost::numeric::ublas::trans(Finc);
+
+    Matrix Fp(3, 3); 
+    Fp(0, 0) = 1.0;
+    Fp(0, 1) = 0.0;
+    Fp(0, 2) = (-deltaDist) * sinYawAndHalfDelta;
+    Fp(1, 0) = 0.0;
+    Fp(1, 1) = 1.0;
+    Fp(1, 2) = deltaDist * cosYawAndHalfDelta;
+    Fp(2, 0) = 0.0;
+    Fp(2, 1) = 0.0;
+    Fp(2, 2) = 1.0;
+    Matrix FpT = boost::numeric::ublas::trans(Fp);
+
+    namespace ublas = boost::numeric::ublas;
+    Matrix velCovar = ublas::prod(invCovar, FincT);
+    velCovar = ublas::prod(Finc, invCovar);
+
+    vel.covariance[0] = velCovar(0, 0);
+    vel.covariance[1] = velCovar(0, 1);
+    vel.covariance[2] = velCovar(0, 2);
+    vel.covariance[3] = velCovar(1, 0);
+    vel.covariance[4] = velCovar(1, 1); 
+    vel.covariance[5] = velCovar(1, 2);
+    vel.covariance[6] = velCovar(2, 0);
+    vel.covariance[7] = velCovar(2, 1);
+    vel.covariance[8] = velCovar(2, 2); 
+
+    Matrix poseCovarTmp = ublas::prod(poseCovar, FpT);
+    poseCovarTmp = ublas::prod(Fp, poseCovarTmp);
+    poseCovar = poseCovarTmp + velCovar;
+
+    pose.covariance[0] = poseCovar(0, 0); 
+    pose.covariance[1] = poseCovar(0, 1); 
+    pose.covariance[2] = poseCovar(0, 2);
+    pose.covariance[3] = poseCovar(1, 0);
+    pose.covariance[4] = poseCovar(1, 1);
+    pose.covariance[5] = poseCovar(1, 2);
+    pose.covariance[6] = poseCovar(2, 0);
+    pose.covariance[7] = poseCovar(2, 1);
+    pose.covariance[8] = poseCovar(2, 2);
+
+    // Update pose
     pose.x += deltaX;
     pose.y += deltaY;
     pose.yaw = util::normalizeAngle(pose.yaw + deltaYaw);

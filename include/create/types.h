@@ -226,6 +226,7 @@ namespace create {
     float x;
     float y;
     float yaw;
+    float covariance[9];
   };
 
   typedef Pose Vel;
