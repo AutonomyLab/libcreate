@@ -12,6 +12,9 @@
 
 namespace create {
 
+  inline bool willFloatOverflow(const float a, const float b) {
+    return ( (a < 0.0) == (b < 0.0) && std::abs(b) > std::numeric_limits<float>::max() - std::abs(a) );
+  }
 
   // TODO: Handle SIGINT to do clean disconnect
 
@@ -133,13 +136,12 @@ namespace create {
       vel.yaw = 0.0;
     }
 
-
     // Update covariances
     // Ref: "Introduction to Autonomous Mobile Robots" (Siegwart 2004, page 189)
     float kr = 1.0; // TODO: Perform experiments to find these nondeterministic parameters
     float kl = 1.0;
-    float cosYawAndHalfDelta = cos(pose.yaw + (deltaYaw / 2.0));
-    float sinYawAndHalfDelta = sin(pose.yaw + (deltaYaw / 2.0));
+    float cosYawAndHalfDelta = cos(pose.yaw + (deltaYaw / 2.0)); // deltaX?
+    float sinYawAndHalfDelta = sin(pose.yaw + (deltaYaw / 2.0)); // deltaY?
     float distOverTwoWB = deltaDist / (util::CREATE_2_AXLE_LENGTH * 2.0);
 
     Matrix invCovar(2, 2);
@@ -187,15 +189,15 @@ namespace create {
     poseCovarTmp = ublas::prod(Fp, poseCovarTmp);
     poseCovar = poseCovarTmp + velCovar;
 
-    pose.covariance[0] = poseCovar(0, 0);
-    pose.covariance[1] = poseCovar(0, 1);
-    pose.covariance[2] = poseCovar(0, 2);
-    pose.covariance[3] = poseCovar(1, 0);
-    pose.covariance[4] = poseCovar(1, 1);
-    pose.covariance[5] = poseCovar(1, 2);
-    pose.covariance[6] = poseCovar(2, 0);
-    pose.covariance[7] = poseCovar(2, 1);
-    pose.covariance[8] = poseCovar(2, 2);
+    pose.covariance[0] = willFloatOverflow(pose.covariance[0], poseCovar(0, 0)) ? pose.covariance[0] : poseCovar(0, 0);
+    pose.covariance[1] = willFloatOverflow(pose.covariance[1], poseCovar(0, 1)) ? pose.covariance[1] : poseCovar(0, 1);
+    pose.covariance[2] = willFloatOverflow(pose.covariance[2], poseCovar(0, 2)) ? pose.covariance[2] : poseCovar(0, 2);
+    pose.covariance[3] = willFloatOverflow(pose.covariance[3], poseCovar(1, 0)) ? pose.covariance[3] : poseCovar(1, 0);
+    pose.covariance[4] = willFloatOverflow(pose.covariance[4], poseCovar(1, 1)) ? pose.covariance[4] : poseCovar(1, 1);
+    pose.covariance[5] = willFloatOverflow(pose.covariance[5], poseCovar(1, 2)) ? pose.covariance[5] : poseCovar(1, 2);
+    pose.covariance[6] = willFloatOverflow(pose.covariance[6], poseCovar(2, 0)) ? pose.covariance[6] : poseCovar(2, 0);
+    pose.covariance[7] = willFloatOverflow(pose.covariance[7], poseCovar(2, 1)) ? pose.covariance[7] : poseCovar(2, 1);
+    pose.covariance[8] = willFloatOverflow(pose.covariance[8], poseCovar(2, 2)) ? pose.covariance[8] : poseCovar(2, 2);
 
     // Update pose
     pose.x += deltaX;
