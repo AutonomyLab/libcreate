@@ -34,6 +34,7 @@ namespace create {
     vel.x = 0;
     vel.y = 0;
     vel.yaw = 0;
+    poseCovar = Matrix(3, 3);
     data = boost::shared_ptr<Data>(new Data(model));
     serial = boost::make_shared<Serial>(data);
   }
@@ -156,7 +157,7 @@ namespace create {
     Finc(2, 1) = (-1.0 / util::CREATE_2_AXLE_LENGTH);
     Matrix FincT = boost::numeric::ublas::trans(Finc);
 
-    Matrix Fp(3, 3); 
+    Matrix Fp(3, 3);
     Fp(0, 0) = 1.0;
     Fp(0, 1) = 0.0;
     Fp(0, 2) = (-deltaDist) * sinYawAndHalfDelta;
@@ -170,24 +171,24 @@ namespace create {
 
     namespace ublas = boost::numeric::ublas;
     Matrix velCovar = ublas::prod(invCovar, FincT);
-    velCovar = ublas::prod(Finc, invCovar);
+    velCovar = ublas::prod(Finc, velCovar);
 
     vel.covariance[0] = velCovar(0, 0);
     vel.covariance[1] = velCovar(0, 1);
     vel.covariance[2] = velCovar(0, 2);
     vel.covariance[3] = velCovar(1, 0);
-    vel.covariance[4] = velCovar(1, 1); 
+    vel.covariance[4] = velCovar(1, 1);
     vel.covariance[5] = velCovar(1, 2);
     vel.covariance[6] = velCovar(2, 0);
     vel.covariance[7] = velCovar(2, 1);
-    vel.covariance[8] = velCovar(2, 2); 
+    vel.covariance[8] = velCovar(2, 2);
 
     Matrix poseCovarTmp = ublas::prod(poseCovar, FpT);
     poseCovarTmp = ublas::prod(Fp, poseCovarTmp);
     poseCovar = poseCovarTmp + velCovar;
 
-    pose.covariance[0] = poseCovar(0, 0); 
-    pose.covariance[1] = poseCovar(0, 1); 
+    pose.covariance[0] = poseCovar(0, 0);
+    pose.covariance[1] = poseCovar(0, 1);
     pose.covariance[2] = poseCovar(0, 2);
     pose.covariance[3] = poseCovar(1, 0);
     pose.covariance[4] = poseCovar(1, 1);
@@ -240,7 +241,24 @@ namespace create {
   //}
 
   bool Create::setMode(const CreateMode& mode) {
-    return serial->sendOpcode((Opcode) mode);
+    switch (mode) {
+      case MODE_OFF:
+        return serial->sendOpcode(OC_POWER);
+        break;
+      case MODE_PASSIVE:
+        return serial->sendOpcode(OC_START);
+        break;
+      case MODE_SAFE:
+        return serial->sendOpcode(OC_SAFE);
+        break;
+      case MODE_FULL:
+        return serial->sendOpcode(OC_FULL);
+        break;
+      default:
+        CERR("[create::Create] ", "cannot set robot to mode '" << mode << "'");
+        break;
+    }
+    return false;
   }
 
   bool Create::clean(const CleanMode& mode) {
