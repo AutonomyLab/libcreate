@@ -12,9 +12,10 @@
 
 namespace create {
 
+  namespace ublas = boost::numeric::ublas;
 
   // TODO: Handle SIGINT to do clean disconnect
-
+  
   void Create::init() {
     mainMotorPower = 0;
     sideMotorPower = 0;
@@ -50,6 +51,30 @@ namespace create {
 
   Create::~Create() {
     disconnect();
+  }
+
+  Create::Matrix Create::addMatrices(const Matrix &A, const Matrix &B) const {
+    int rows = A.size1();
+    int cols = A.size2();
+
+    assert(rows == B.size1());
+    assert(cols == B.size2());
+
+    Matrix C(rows, cols);
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        const float a = A(i, j);
+        const float b = B(i, j);
+        if (util::willFloatOverflow(a, b)) {
+          // If overflow, set to float min or max depending on direction of overflow
+          C(i, j) = (a < 0.0) ? std::numeric_limits<float>::min() : std::numeric_limits<float>::max();
+        }
+        else {
+          C(i, j) = a + b;
+        }
+      }
+    }
+    return C;
   }
 
   void Create::onData() {
@@ -133,7 +158,6 @@ namespace create {
       vel.yaw = 0.0;
     }
 
-
     // Update covariances
     // Ref: "Introduction to Autonomous Mobile Robots" (Siegwart 2004, page 189)
     float kr = 1.0; // TODO: Perform experiments to find these nondeterministic parameters
@@ -169,7 +193,6 @@ namespace create {
     Fp(2, 2) = 1.0;
     Matrix FpT = boost::numeric::ublas::trans(Fp);
 
-    namespace ublas = boost::numeric::ublas;
     Matrix velCovar = ublas::prod(invCovar, FincT);
     velCovar = ublas::prod(Finc, velCovar);
 
@@ -185,7 +208,7 @@ namespace create {
 
     Matrix poseCovarTmp = ublas::prod(poseCovar, FpT);
     poseCovarTmp = ublas::prod(Fp, poseCovarTmp);
-    poseCovar = poseCovarTmp + velCovar;
+    poseCovar = addMatrices(poseCovarTmp, velCovar);
 
     pose.covariance[0] = poseCovar(0, 0);
     pose.covariance[1] = poseCovar(0, 1);

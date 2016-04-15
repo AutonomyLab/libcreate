@@ -81,8 +81,10 @@ namespace create {
       Matrix poseCovar;
 
       void init();
-      bool updateLEDs();
+      // Add two matrices and handle overflow case
+      Matrix addMatrices(const Matrix &A, const Matrix &B) const;
       void onData();
+      bool updateLEDs();
 
     protected:
       boost::shared_ptr<create::Data> data;
