@@ -454,11 +454,11 @@ namespace create {
 
       /* Get the estimated position of Create based on wheel encoders.
        */
-      const create::Pose& getPose() const;
+      create::Pose getPose() const;
 
       /* Get the estimated velocity of Create based on wheel encoders.
        */
-      const create::Vel& getVel() const;
+      create::Vel getVel() const;
 
       /* Get the number of corrupt serial packets since first connecting to Create.
        */

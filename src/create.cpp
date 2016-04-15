@@ -32,10 +32,12 @@ namespace create {
     pose.x = 0;
     pose.y = 0;
     pose.yaw = 0;
+    pose.covariance = std::vector<float>(9, 0.0);
     vel.x = 0;
     vel.y = 0;
     vel.yaw = 0;
-    poseCovar = Matrix(3, 3);
+    vel.covariance = std::vector<float>(9, 0.0);
+    poseCovar = Matrix(3, 3, 0.0);
     data = boost::shared_ptr<Data>(new Data(model));
     serial = boost::make_shared<Serial>(data);
   }
@@ -871,11 +873,11 @@ namespace create {
     }
   }
 
-  const Pose& Create::getPose() const {
+  Pose Create::getPose() const {
     return pose;
   }
 
-  const Vel& Create::getVel() const {
+  Vel Create::getVel() const {
     return vel;
   }
 
