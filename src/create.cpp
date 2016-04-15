@@ -871,11 +871,11 @@ namespace create {
     }
   }
 
-  const Pose& Create::getPose() const {
+  Pose Create::getPose() const {
     return pose;
   }
 
-  const Vel& Create::getVel() const {
+  Vel Create::getVel() const {
     return vel;
   }
 
