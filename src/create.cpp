@@ -15,7 +15,7 @@ namespace create {
   namespace ublas = boost::numeric::ublas;
 
   // TODO: Handle SIGINT to do clean disconnect
-  
+
   void Create::init() {
     mainMotorPower = 0;
     sideMotorPower = 0;
@@ -162,8 +162,8 @@ namespace create {
     // Ref: "Introduction to Autonomous Mobile Robots" (Siegwart 2004, page 189)
     float kr = 1.0; // TODO: Perform experiments to find these nondeterministic parameters
     float kl = 1.0;
-    float cosYawAndHalfDelta = cos(pose.yaw + (deltaYaw / 2.0));
-    float sinYawAndHalfDelta = sin(pose.yaw + (deltaYaw / 2.0));
+    float cosYawAndHalfDelta = cos(pose.yaw + (deltaYaw / 2.0)); // deltaX?
+    float sinYawAndHalfDelta = sin(pose.yaw + (deltaYaw / 2.0)); // deltaY?
     float distOverTwoWB = deltaDist / (util::CREATE_2_AXLE_LENGTH * 2.0);
 
     Matrix invCovar(2, 2);
