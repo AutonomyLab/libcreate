@@ -32,10 +32,12 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef CREATE_TYPES_H
 #define CREATE_TYPES_H
 
+#include <vector>
+
 namespace create {
   enum RobotModel {
     CREATE_1 = 0, // Roomba 400 series
-    CREATE_2      // Roomba 600 series 
+    CREATE_2      // Roomba 600 series
   };
 
   enum SensorPacketID {
@@ -153,10 +155,10 @@ namespace create {
   };
 
   enum CreateMode {
-    MODE_OFF = OC_POWER,
-    MODE_PASSIVE = OC_START,
-    MODE_SAFE = OC_SAFE,
-    MODE_FULL = OC_FULL,
+    MODE_OFF = 0,
+    MODE_PASSIVE = 1,
+    MODE_SAFE = 2,
+    MODE_FULL = 3,
     MODE_UNAVAILABLE = -1
   };
 
@@ -226,6 +228,7 @@ namespace create {
     float x;
     float y;
     float yaw;
+    std::vector<float> covariance;
   };
 
   typedef Pose Vel;

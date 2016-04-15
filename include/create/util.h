@@ -69,6 +69,10 @@ namespace create {
       gettimeofday(&now, NULL);
       return now.tv_usec + (timestamp_t) now.tv_sec * 1000000;
     }
+
+    inline bool willFloatOverflow(const float a, const float b) {
+      return ( (a < 0.0) == (b < 0.0) && std::abs(b) > std::numeric_limits<float>::max() - std::abs(a) );
+    }
   }  // namespace util
 } // namespace create
 
