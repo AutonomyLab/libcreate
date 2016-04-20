@@ -150,8 +150,8 @@ namespace create {
     } // if CREATE_2
 
     if (fabs(dt) > util::EPS) {
-      vel.x = deltaX / dt;
-      vel.y = deltaY / dt;
+      vel.x = deltaDist / dt;
+      vel.y = 0.0;
       vel.yaw = deltaYaw / dt;
     }
     else {
