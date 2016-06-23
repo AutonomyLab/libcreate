@@ -28,6 +28,8 @@ namespace create {
     powerLEDIntensity = 0;
     prevTicksLeft = 0;
     prevTicksRight = 0;
+    totalLeftDist = 0.0;
+    totalRightDist = 0.0;
     firstOnData = true;
     pose.x = 0;
     pose.y = 0;
@@ -104,9 +106,9 @@ namespace create {
       deltaYaw = ((int16_t) GET_DATA(ID_ANGLE)) * (util::PI / 180.0); // D2R
       deltaX = deltaDist * cos( util::normalizeAngle(pose.yaw + deltaYaw) );
       deltaY = -deltaDist * sin( util::normalizeAngle(pose.yaw + deltaYaw) );
-      leftWheelDist = deltaDist / 2.0;
-      rightWheelDist = leftWheelDist;
-
+      const float deltaYawWheelDist = (util::CREATE_1_AXLE_LENGTH / 2.0) * deltaYaw;
+      leftWheelDist = deltaDist - deltaYawWheelDist;
+      rightWheelDist = deltaDist + deltaYawWheelDist;
     }
     else if (model == CREATE_2) {
       // Get cumulative ticks (wraps around at 65535)
@@ -148,6 +150,9 @@ namespace create {
         deltaY = -turnRadius * (cos(pose.yaw + deltaYaw) - cos(pose.yaw));
       }
     } // if CREATE_2
+
+    totalLeftDist += leftWheelDist;
+    totalRightDist += rightWheelDist;
 
     if (fabs(dt) > util::EPS) {
       vel.x = deltaDist / dt;
@@ -861,6 +866,40 @@ namespace create {
       CERR("[create::Create] ", "Stasis sensor not supported!");
       return false;
     }
+  }
+
+  float Create::getLeftWheelDistance() const {
+      return totalLeftDist;
+  }
+
+  float Create::getRightWheelDistance() const {
+      return totalRightDist;
+  }
+
+  float Create::getRequestedLeftWheelVel() const {
+      if (data->isValidPacketID(ID_LEFT_VEL)) {
+          uint16_t uvel = GET_DATA(ID_LEFT_VEL);
+          int16_t vel;
+          std::memcpy(&vel, &uvel, sizeof(vel));
+          return (vel / 1000.0);
+      }
+      else {
+        CERR("[create::Create] ", "Left wheel velocity not supported!");
+        return 0;
+      }
+  }
+
+  float Create::getRequestedRightWheelVel() const {
+      if (data->isValidPacketID(ID_RIGHT_VEL)) {
+        uint16_t uvel = GET_DATA(ID_RIGHT_VEL);
+        int16_t vel;
+        std::memcpy(&vel, &uvel, sizeof(vel));
+        return (vel / 1000.0);
+      }
+      else {
+        CERR("[create::Create] ", "Right wheel velocity not supported!");
+        return 0;
+      }
   }
 
   create::CreateMode Create::getMode() const {
