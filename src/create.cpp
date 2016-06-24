@@ -103,7 +103,7 @@ namespace create {
       deltaDist = ((int16_t) GET_DATA(ID_DISTANCE)) / 1000.0; //mm -> m
       deltaYaw = ((int16_t) GET_DATA(ID_ANGLE)) * (util::PI / 180.0); // D2R
       deltaX = deltaDist * cos( util::normalizeAngle(pose.yaw + deltaYaw) );
-      deltaY = -deltaDist * sin( util::normalizeAngle(pose.yaw + deltaYaw) );
+      deltaY = deltaDist * sin( util::normalizeAngle(pose.yaw + deltaYaw) );
       leftWheelDist = deltaDist / 2.0;
       rightWheelDist = leftWheelDist;
 
