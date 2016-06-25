@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(libcreate)
 
 find_package(Boost REQUIRED system thread)
+find_package(Threads REQUIRED)
 
 ## Specify additional locations of header files
 include_directories(
@@ -15,6 +16,15 @@ add_library(create
   src/data.cpp
   src/packet.cpp
 )
+
+if(THREADS_HAVE_PTHREAD_ARG)
+  set_property(TARGET create PROPERTY COMPILE_OPTIONS "-pthread")
+  set_property(TARGET create PROPERTY INTERFACE_COMPILE_OPTIONS "-pthread")
+endif()
+
+if(CMAKE_THREAD_LIBS_INIT)
+  target_link_libraries(create "${CMAKE_THREAD_LIBS_INIT}")
+endif()
 
 target_link_libraries(create
   ${Boost_LIBRARIES}
