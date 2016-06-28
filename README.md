@@ -5,7 +5,7 @@ C++ library for interfacing with iRobot's [Create 1 and 2](http://www.irobot.com
 * Documentation: TODO
 * Code API: TODO
 * Author: [Jacob Perron](http://jacobperron.ca) ([Autonomy Lab](http://autonomylab.org), [Simon Fraser University](http://www.sfu.ca))
-* Contributors: [Mani Monajjemi](http:mani.im)
+* Contributors: [Mani Monajjemi](http:mani.im), [Ben Wolsieffer](https://github.com/lopsided98)
 
 ## Dependencies
 
@@ -27,6 +27,7 @@ Example compile line: `g++ create_demo.cpp -lcreate -lboost_system -lboost_threa
 ## Bugs
 
 * _Clock_ and _Schedule_ button presses are not detected. This is a known problem to the developers at iRobot.
+* Inaccurate odometry angle for Create 1 ([#22](https://github.com/AutonomyLab/libcreate/issues/22))
 
 ## Build Status
 
