@@ -26,6 +26,8 @@ namespace create {
     ADD_PACKET(ID_CAPACITY, 2, "battery_capacity");
     ADD_PACKET(ID_VIRTUAL_WALL, 1, "virtual_wall");
     ADD_PACKET(ID_OI_MODE, 1, "oi_mode");
+    ADD_PACKET(ID_RIGHT_VEL, 2, "velocity_right");
+    ADD_PACKET(ID_LEFT_VEL, 2, "velocity_left");
 
     if (model == CREATE_1) {
       ADD_PACKET(ID_DISTANCE, 2, "distance");
@@ -48,8 +50,6 @@ namespace create {
       //ADD_PACKET(ID_NUM_STREAM_PACKETS, 1, "oi_stream_num_packets");
       //ADD_PACKET(ID_VEL, 2, "velocity");
       //ADD_PACKET(ID_RADIUS, 2, "radius");
-      //ADD_PACKET(ID_RIGHT_VEL, 2, "velocity_right");
-      //ADD_PACKET(ID_LEFT_VEL, 2, "velocity_left");
       ADD_PACKET(ID_LEFT_ENC, 2, "enc_counts_left");
       ADD_PACKET(ID_RIGHT_ENC, 2, "enc_counts_right");
       ADD_PACKET(ID_LIGHT, 1, "light_bumper");
