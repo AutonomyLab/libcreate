@@ -73,8 +73,8 @@ namespace create {
 
       uint32_t prevTicksLeft;
       uint32_t prevTicksRight;
-      float prevLeftVel;
-      float prevRightVel;
+      float totalLeftDist;
+      float totalRightDist;
       bool firstOnData;
       util::timestamp_t prevOnDataTime;
 
@@ -443,6 +443,22 @@ namespace create {
       /* Return true if Create is moving forward, false otherwise.
        */
       bool isMovingForward() const;
+
+      /* Get the total distance (in meters) the left wheel has moved.
+       */
+      float getLeftWheelDistance() const;
+
+      /* Get the total distance (in meters) the right wheel has moved.
+       */
+      float getRightWheelDistance() const;
+
+      /* Get the requested velocity (in meters/sec) of the left wheel.
+       */
+      float getRequestedLeftWheelVel() const;
+
+      /* Get the requested velocity (in meters/sec) of the right wheel.
+       */
+      float getRequestedRightWheelVel() const;
 
       /* Get the current charging state.
        */

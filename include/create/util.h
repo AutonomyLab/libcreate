@@ -40,6 +40,8 @@ POSSIBILITY OF SUCH DAMAGE.
 namespace create {
   namespace util {
 
+    static const float CREATE_1_AXLE_LENGTH = 0.26;
+
     static const uint8_t CREATE_2_HEADER = 19;
     static const float CREATE_2_AXLE_LENGTH = 0.235;
     static const float CREATE_2_TICKS_PER_REV = 508.8;
