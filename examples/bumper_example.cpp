@@ -3,7 +3,7 @@
 int main(int argc, char** argv) {
   std::string port = "/dev/ttyUSB0";
   int baud = 115200;
-  create::RobotModel model = create::CREATE_2;
+  create::RobotModel model = create::RobotModel::CREATE_2;
 
   create::Create* robot = new create::Create(model);
 

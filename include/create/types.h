@@ -33,11 +33,46 @@ POSSIBILITY OF SUCH DAMAGE.
 #define CREATE_TYPES_H
 
 #include <vector>
+#include <stdint.h>
+#include <string>
+#include <stdexcept>
 
 namespace create {
-  enum RobotModel {
-    CREATE_1 = 0, // Roomba 400 series
-    CREATE_2      // Roomba 600 series
+  enum ProtocolVersion {
+    V_1 = 1,
+    V_2 = 2,
+    V_3 = 4,
+    V_ALL = 0xFFFFFFFF
+  };
+
+
+
+  class RobotModel {
+    public:
+      bool operator==(RobotModel& other) const;
+      operator uint32_t() const;
+
+      uint32_t getId() const;
+      ProtocolVersion getVersion() const;
+      float getAxleLength() const;
+      unsigned int getBaud() const;
+      float getMaxVelocity() const;
+      float getWheelDiameter() const;
+
+      static RobotModel ROOMBA_400; // Roomba 400 series
+      static RobotModel CREATE_1; // Roomba 500 series
+      static RobotModel CREATE_2;   // Roomba 600 series
+
+    private:
+      uint32_t id;
+      ProtocolVersion version;
+      float axleLength;
+      unsigned int baud;
+      float maxVelocity;
+      float wheelDiameter;
+
+      RobotModel(const ProtocolVersion version, const float axleLength, const unsigned int baud, const float maxVelocity = 0.5, const float wheelDiameter = 0.078);
+      static uint32_t nextId;
   };
 
   enum SensorPacketID {
@@ -60,8 +95,8 @@ namespace create {
     ID_CLIFF_RIGHT = 12,
     ID_VIRTUAL_WALL = 13,
     ID_OVERCURRENTS = 14,
-    ID_DIRT_DETECT = 15,
-    ID_UNUSED_1 = 16,
+    ID_DIRT_DETECT_LEFT = 15,
+    ID_DIRT_DETECT_RIGHT = 16,
     ID_IR_OMNI = 17,
     ID_IR_LEFT = 52,
     ID_IR_RIGHT = 53,
@@ -79,8 +114,8 @@ namespace create {
     ID_CLIFF_FRONT_LEFT_SIGNAL = 29,
     ID_CLIFF_FRONT_RIGHT_SIGNAL = 30,
     ID_CLIFF_RIGHT_SIGNAL = 31,
-    ID_UNUSED_2 = 32,
-    ID_UNUSED_3 = 33,
+    ID_CARGO_BAY_DIGITAL_INPUTS = 32,
+    ID_CARGO_BAY_ANALOG_SIGNAL = 33,
     ID_CHARGE_SOURCE = 34,
     ID_OI_MODE = 35,
     ID_SONG_NUM = 36,
@@ -112,6 +147,7 @@ namespace create {
     OC_RESET = 7,
     OC_STOP = 173,
     OC_BAUD = 129,
+    OC_CONTROL = 130,
     OC_SAFE = 131,
     OC_FULL = 132,
     OC_CLEAN = 135,
