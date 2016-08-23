@@ -1,7 +1,7 @@
 /**
 Software License Agreement (BSD)
 
-\file      data.h
+\file      serial_stream.h
 \authors   Jacob Perron <jperron@sfu.ca>
 \copyright Copyright (c) 2015, Autonomy Lab (Simon Fraser University), All rights reserved.
 
@@ -29,35 +29,53 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef CREATE_DATA_H
-#define CREATE_DATA_H
+// Based on example from:
+//   https://github.com/labust/labust-ros-pkg/wiki/Create-a-Serial-Port-application
 
+#ifndef CREATE_SERIAL_STREAM_H
+#define CREATE_SERIAL_STREAM_H
+
+#include <boost/asio.hpp>
+#include <boost/thread.hpp>
+#include <boost/thread/condition_variable.hpp>
+#include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-#include <map>
-#include <vector>
 
-#include "create/packet.h"
+#include "create/data.h"
 #include "create/types.h"
+#include "create/util.h"
+#include "create/serial.h"
 
 namespace create {
-  class Data {
+  class SerialStream : public Serial {
     private:
-      std::map<uint8_t, boost::shared_ptr<Packet> > packets;
-      uint32_t totalDataBytes;
-      std::vector<uint8_t> ids;
+      enum ReadState {
+        READ_HEADER,
+        READ_NBYTES,
+        READ_PACKET_ID,
+        READ_PACKET_BYTES,
+        READ_CHECKSUM
+      };
+
+      // State machine variables
+      ReadState readState;
+      uint8_t headerByte;
+      uint8_t packetID;
+      uint8_t expectedNumBytes;
+      uint16_t packetBytes;
+      uint8_t numBytesRead;
+      uint32_t byteSum;
+      uint8_t numDataBytesRead;
+      uint8_t expectedNumDataBytes;
+
+    protected:
+      bool startSensorStream();
+      void processByte(uint8_t byteRead);
 
     public:
-      Data(ProtocolVersion version = V_3);
-      ~Data();
+      SerialStream(boost::shared_ptr<Data> data, const uint8_t& header = create::util::STREAM_HEADER);
 
-      bool isValidPacketID(const uint8_t id) const;
-      boost::shared_ptr<Packet> getPacket(const uint8_t id);
-      void validateAll();
-      uint32_t getTotalDataBytes() const;
-      uint8_t getNumPackets() const;
-      std::vector<uint8_t> getPacketIDs();
   };
 }  // namespace create
 
-#endif // CREATE_DATA_H
+#endif // CREATE_SERIAL_H

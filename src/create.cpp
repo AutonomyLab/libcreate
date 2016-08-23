@@ -8,7 +8,8 @@
 #include "create/create.h"
 
 #define GET_DATA(id) (data->getPacket(id)->getData())
-#define BOUND(val,min,max) (val<min?val=min:(val>max?val=max:val=val))
+#define BOUND_CONST(val,min,max) (val<min?min:(val>max?max:val))
+#define BOUND(val,min,max) (val = BOUND_CONST(val,min,max))
 
 namespace create {
 
@@ -31,6 +32,7 @@ namespace create {
     totalLeftDist = 0.0;
     totalRightDist = 0.0;
     firstOnData = true;
+    mode = MODE_OFF;
     pose.x = 0;
     pose.y = 0;
     pose.yaw = 0;
@@ -40,8 +42,14 @@ namespace create {
     vel.yaw = 0;
     vel.covariance = std::vector<float>(9, 0.0);
     poseCovar = Matrix(3, 3, 0.0);
-    data = boost::shared_ptr<Data>(new Data(model));
-    serial = boost::make_shared<Serial>(data);
+    requestedLeftVel = 0;
+    requestedRightVel = 0;
+    data = boost::shared_ptr<Data>(new Data(model.getVersion()));
+    if (model.getVersion() == V_1) {
+      serial = boost::make_shared<SerialQuery>(data);
+    } else {
+      serial = boost::make_shared<SerialStream>(data);
+    }
   }
 
   Create::Create(RobotModel m) : model(m) {
@@ -83,7 +91,7 @@ namespace create {
 
   void Create::onData() {
     if (firstOnData) {
-      if (model == CREATE_2) {
+      if (model.getVersion() >= V_3) {
         // Initialize tick counts
         prevTicksLeft = GET_DATA(ID_LEFT_ENC);
         prevTicksRight = GET_DATA(ID_RIGHT_ENC);
@@ -95,22 +103,45 @@ namespace create {
     // Get current time
     util::timestamp_t curTime = util::getTimestamp();
     float dt = (curTime - prevOnDataTime) / 1000000.0;
-    float deltaDist, deltaX, deltaY, deltaYaw, leftWheelDist, rightWheelDist;
-    if (model == CREATE_1) {
-      /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-       * Angle returned is NOT correct if your robot is using older firmware:      *
-       * http://answers.ros.org/question/31935/createroomba-odometry/              *
-       * TODO: Consider using velocity command as substitute for pose estimation.  *
-       * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-      deltaDist = ((int16_t) GET_DATA(ID_DISTANCE)) / 1000.0; //mm -> m
-      deltaYaw = ((int16_t) GET_DATA(ID_ANGLE)) * (util::PI / 180.0); // D2R
-      deltaX = deltaDist * cos( util::normalizeAngle(pose.yaw + deltaYaw) );
-      deltaY = deltaDist * sin( util::normalizeAngle(pose.yaw + deltaYaw) );
-      const float deltaYawWheelDist = (util::CREATE_1_AXLE_LENGTH / 2.0) * deltaYaw;
-      leftWheelDist = deltaDist - deltaYawWheelDist;
-      rightWheelDist = deltaDist + deltaYawWheelDist;
+    float deltaDist, deltaX, deltaY, deltaYaw, leftWheelDist, rightWheelDist, wheelDistDiff;
+
+    // Protocol versions 1 and 2 use distance and angle fields for odometry
+    int16_t angleField;
+    if (model.getVersion() <= V_2) {
+      // This is a standards compliant way of doing unsigned to signed conversion
+      uint16_t distanceRaw = GET_DATA(ID_DISTANCE);
+      int16_t distance;
+      std::memcpy(&distance, &distanceRaw, sizeof(distance));
+      deltaDist = distance / 1000.0; // mm -> m
+
+      // Angle is processed differently in versions 1 and 2
+      uint16_t angleRaw = GET_DATA(ID_ANGLE);
+      std::memcpy(&angleField, &angleRaw, sizeof(angleField));
     }
-    else if (model == CREATE_2) {
+
+    if (model.getVersion() == V_1) {
+      wheelDistDiff = 2.0 * angleField / 1000.0;
+      leftWheelDist = deltaDist - (wheelDistDiff / 2.0);
+      rightWheelDist = deltaDist + (wheelDistDiff / 2.0);
+      deltaYaw = wheelDistDiff / model.getAxleLength();
+    } else if (model.getVersion() == V_2) {
+      /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+       * Certain older Creates have major problems with odometry                   *
+       * http://answers.ros.org/question/31935/createroomba-odometry/              *
+       *                                                                           *
+       * All Creates have an issue with rounding of the angle field, which causes  *
+       * major errors to accumulate in the odometry yaw.                           *
+       * http://wiki.tekkotsu.org/index.php/Create_Odometry_Bug                    *
+       * https://github.com/AutonomyLab/create_autonomy/issues/28                  *
+       *                                                                           *
+       * TODO: Consider using velocity command as substitute for pose estimation   *
+       * to mitigate both of these problems.                                       *
+       * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+      deltaYaw = angleField * (util::PI / 180.0); // D2R
+      wheelDistDiff = model.getAxleLength() * deltaYaw;
+      leftWheelDist = deltaDist - (wheelDistDiff / 2.0);
+      rightWheelDist = deltaDist + (wheelDistDiff / 2.0);
+    } else if (model.getVersion() >= V_3) {
       // Get cumulative ticks (wraps around at 65535)
       uint16_t totalTicksLeft = GET_DATA(ID_LEFT_ENC);
       uint16_t totalTicksRight = GET_DATA(ID_RIGHT_ENC);
@@ -121,35 +152,33 @@ namespace create {
       prevTicksRight = totalTicksRight;
 
       // Handle wrap around
-      if (fabs(ticksLeft) > 0.9 * util::CREATE_2_MAX_ENCODER_TICKS) {
-        ticksLeft = (ticksLeft % util::CREATE_2_MAX_ENCODER_TICKS) + 1;
+      if (fabs(ticksLeft) > 0.9 * util::V_3_MAX_ENCODER_TICKS) {
+        ticksLeft = (ticksLeft % util::V_3_MAX_ENCODER_TICKS) + 1;
       }
-      if (fabs(ticksRight) > 0.9 * util::CREATE_2_MAX_ENCODER_TICKS) {
-        ticksRight = (ticksRight % util::CREATE_2_MAX_ENCODER_TICKS) + 1;
+      if (fabs(ticksRight) > 0.9 * util::V_3_MAX_ENCODER_TICKS) {
+        ticksRight = (ticksRight % util::V_3_MAX_ENCODER_TICKS) + 1;
       }
 
       // Compute distance travelled by each wheel
-      leftWheelDist = (ticksLeft / util::CREATE_2_TICKS_PER_REV)
-                       * util::CREATE_2_WHEEL_DIAMETER * util::PI;
-      rightWheelDist = (ticksRight / util::CREATE_2_TICKS_PER_REV)
-                        * util::CREATE_2_WHEEL_DIAMETER * util::PI;
-
-      float wheelDistDiff = rightWheelDist - leftWheelDist;
+      leftWheelDist = (ticksLeft / util::V_3_TICKS_PER_REV)
+          * model.getWheelDiameter() * util::PI;
+      rightWheelDist = (ticksRight / util::V_3_TICKS_PER_REV)
+          * model.getWheelDiameter() * util::PI;
       deltaDist = (rightWheelDist + leftWheelDist) / 2.0;
 
-      // Moving straight
-      if (fabs(wheelDistDiff) < util::EPS) {
-        deltaX = deltaDist * cos(pose.yaw);
-        deltaY = deltaDist * sin(pose.yaw);
-        deltaYaw = 0.0;
-      }
-      else {
-        float turnRadius = (util::CREATE_2_AXLE_LENGTH / 2.0) * (leftWheelDist + rightWheelDist) / wheelDistDiff;
-        deltaYaw = wheelDistDiff / util::CREATE_2_AXLE_LENGTH;
-        deltaX = turnRadius * (sin(pose.yaw + deltaYaw) - sin(pose.yaw));
-        deltaY = -turnRadius * (cos(pose.yaw + deltaYaw) - cos(pose.yaw));
-      }
-    } // if CREATE_2
+      wheelDistDiff = rightWheelDist - leftWheelDist;
+      deltaYaw = wheelDistDiff / model.getAxleLength();
+    }
+
+    // Moving straight
+    if (fabs(wheelDistDiff) < util::EPS) {
+      deltaX = deltaDist * cos(pose.yaw);
+      deltaY = deltaDist * sin(pose.yaw);
+    } else {
+      float turnRadius = (model.getAxleLength() / 2.0) * (leftWheelDist + rightWheelDist) / wheelDistDiff;
+      deltaX = turnRadius * (sin(pose.yaw + deltaYaw) - sin(pose.yaw));
+      deltaY = -turnRadius * (cos(pose.yaw + deltaYaw) - cos(pose.yaw));
+    }
 
     totalLeftDist += leftWheelDist;
     totalRightDist += rightWheelDist;
@@ -158,8 +187,7 @@ namespace create {
       vel.x = deltaDist / dt;
       vel.y = 0.0;
       vel.yaw = deltaYaw / dt;
-    }
-    else {
+    } else {
       vel.x = 0.0;
       vel.y = 0.0;
       vel.yaw = 0.0;
@@ -171,7 +199,7 @@ namespace create {
     float kl = 1.0;
     float cosYawAndHalfDelta = cos(pose.yaw + (deltaYaw / 2.0)); // deltaX?
     float sinYawAndHalfDelta = sin(pose.yaw + (deltaYaw / 2.0)); // deltaY?
-    float distOverTwoWB = deltaDist / (util::CREATE_2_AXLE_LENGTH * 2.0);
+    float distOverTwoWB = deltaDist / (model.getAxleLength() * 2.0);
 
     Matrix invCovar(2, 2);
     invCovar(0, 0) = kr * fabs(rightWheelDist);
@@ -184,8 +212,8 @@ namespace create {
     Finc(0, 1) = (cosYawAndHalfDelta / 2.0) + (distOverTwoWB * sinYawAndHalfDelta);
     Finc(1, 0) = (sinYawAndHalfDelta / 2.0) + (distOverTwoWB * cosYawAndHalfDelta);
     Finc(1, 1) = (sinYawAndHalfDelta / 2.0) - (distOverTwoWB * cosYawAndHalfDelta);
-    Finc(2, 0) = (1.0 / util::CREATE_2_AXLE_LENGTH);
-    Finc(2, 1) = (-1.0 / util::CREATE_2_AXLE_LENGTH);
+    Finc(2, 0) = (1.0 / model.getAxleLength());
+    Finc(2, 1) = (-1.0 / model.getAxleLength());
     Matrix FincT = boost::numeric::ublas::trans(Finc);
 
     Matrix Fp(3, 3);
@@ -271,24 +299,39 @@ namespace create {
   //}
 
   bool Create::setMode(const CreateMode& mode) {
+    if (model.getVersion() == V_1){
+      // Switch to safe mode (required for compatibility with V_1)
+      if (!(serial->sendOpcode(OC_START) && serial->sendOpcode(OC_CONTROL))) return false;
+    }
+    bool ret;
     switch (mode) {
       case MODE_OFF:
-        return serial->sendOpcode(OC_POWER);
+        if (model.getVersion() == V_2) {
+          CERR("[create::Create] ", "protocol version 2 does not support turning robot off");
+          ret = false;
+        } else {
+          ret = serial->sendOpcode(OC_POWER);
+        }
         break;
       case MODE_PASSIVE:
-        return serial->sendOpcode(OC_START);
+        ret = serial->sendOpcode(OC_START);
         break;
       case MODE_SAFE:
-        return serial->sendOpcode(OC_SAFE);
+        if (model.getVersion() > V_1) {
+          ret = serial->sendOpcode(OC_SAFE);
+        }
         break;
       case MODE_FULL:
-        return serial->sendOpcode(OC_FULL);
+        ret = serial->sendOpcode(OC_FULL);
         break;
       default:
         CERR("[create::Create] ", "cannot set robot to mode '" << mode << "'");
-        break;
+        ret = false;
     }
-    return false;
+    if (ret) {
+      this->mode = mode;
+    }
+    return ret;
   }
 
   bool Create::clean(const CleanMode& mode) {
@@ -309,16 +352,18 @@ namespace create {
     return serial->send(cmd, 4);
   }
 
-  bool Create::driveRadius(const float& vel, const float& radius) const {
+  bool Create::driveRadius(const float& vel, const float& radius) {
+    // Bound velocity
+    float boundedVel = BOUND_CONST(vel, -model.getMaxVelocity(), model.getMaxVelocity());
+
     // Expects each parameter as two bytes each and in millimeters
-    int16_t vel_mm = roundf(vel * 1000);
+    int16_t vel_mm = roundf(boundedVel * 1000);
     int16_t radius_mm = roundf(radius * 1000);
-    BOUND(vel_mm, -util::CREATE_2_MAX_VEL * 1000, util::CREATE_2_MAX_VEL * 1000);
 
     // Bound radius if not a special case
     if (radius_mm != 32768 && radius_mm != 32767 &&
         radius_mm != -1 && radius_mm != 1) {
-      BOUND(radius_mm, -util::CREATE_2_MAX_RADIUS, util::CREATE_2_MAX_RADIUS);
+      BOUND(radius_mm, -util::MAX_RADIUS * 1000, util::MAX_RADIUS * 1000);
     }
 
     uint8_t cmd[5] = { OC_DRIVE,
@@ -331,25 +376,58 @@ namespace create {
     return serial->send(cmd, 5);
   }
 
-  bool Create::driveWheels(const float& leftVel, const float& rightVel) const {
-    int16_t leftCmd = roundf(leftVel * 1000);
-    int16_t rightCmd = roundf(rightVel * 1000);
-    BOUND(leftCmd, -util::CREATE_2_MAX_VEL * 1000, util::CREATE_2_MAX_VEL * 1000);
-    BOUND(rightCmd, -util::CREATE_2_MAX_VEL * 1000, util::CREATE_2_MAX_VEL * 1000);
+  bool Create::driveWheels(const float& leftVel, const float& rightVel) {
+    const float boundedLeftVel = BOUND_CONST(leftVel, -model.getMaxVelocity(), model.getMaxVelocity());
+    const float boundedRightVel = BOUND_CONST(rightVel, -model.getMaxVelocity(), model.getMaxVelocity());
+    requestedLeftVel = boundedLeftVel;
+    requestedRightVel = boundedRightVel;
+    if (model.getVersion() > V_1) {
+      int16_t leftCmd = roundf(boundedLeftVel * 1000);
+      int16_t rightCmd = roundf(boundedRightVel * 1000);
 
-    uint8_t cmd[5] = { OC_DRIVE_DIRECT,
-                       rightCmd >> 8,
-                       rightCmd & 0xff,
-                       leftCmd >> 8,
-                       leftCmd & 0xff
-                     };
-    return serial->send(cmd, 5);
+      uint8_t cmd[5] = { OC_DRIVE_DIRECT,
+                         rightCmd >> 8,
+                         rightCmd & 0xff,
+                         leftCmd >> 8,
+                         leftCmd & 0xff
+                       };
+      return serial->send(cmd, 5);
+    } else {
+      float radius;
+      // Prevent divide by zero when driving straight
+      if (boundedLeftVel != boundedRightVel) {
+        radius = -((model.getAxleLength() / 2.0) * (boundedLeftVel + boundedRightVel)) /
+          (boundedLeftVel - boundedRightVel);
+      } else {
+        radius = util::STRAIGHT_RADIUS;
+      }
+
+      float vel;
+      // Fix signs for spin in place
+      if (boundedLeftVel == -boundedRightVel || std::abs(roundf(radius * 1000)) <= 1) {
+        radius = util::IN_PLACE_RADIUS;
+        vel = boundedRightVel;
+      } else {
+        vel = (std::abs(boundedLeftVel) + std::abs(boundedRightVel)) / 2.0 * ((boundedLeftVel + boundedRightVel) > 0 ? 1.0 : -1.0);
+      }
+
+      // Radius turns have a maximum radius of 2.0 meters
+      // When the radius is > 2 but <= 10, use a 2 meter radius
+      // When it is > 10, drive straight
+      // TODO: alternate between these 2 meter radius and straight to
+      // fake a larger radius
+      if (radius > 10.0) {
+        radius = util::STRAIGHT_RADIUS;
+      }
+
+      return driveRadius(vel, radius);
+    }
   }
 
-  bool Create::drive(const float& xVel, const float& angularVel) const {
+  bool Create::drive(const float& xVel, const float& angularVel) {
     // Compute left and right wheel velocities
-    float leftVel = xVel - ((util::CREATE_2_AXLE_LENGTH / 2.0) * angularVel);
-    float rightVel = xVel + ((util::CREATE_2_AXLE_LENGTH / 2.0) * angularVel);
+    float leftVel = xVel - ((model.getAxleLength() / 2.0) * angularVel);
+    float rightVel = xVel + ((model.getAxleLength() / 2.0) * angularVel);
     return driveWheels(leftVel, rightVel);
   }
 
@@ -552,8 +630,8 @@ namespace create {
   }
 
   uint8_t Create::getDirtDetect() const {
-    if (data->isValidPacketID(ID_DIRT_DETECT)) {
-      return GET_DATA(ID_DIRT_DETECT);
+    if (data->isValidPacketID(ID_DIRT_DETECT_LEFT)) {
+      return GET_DATA(ID_DIRT_DETECT_LEFT);
     }
     else {
       CERR("[create::Create] ", "Dirt detector not supported!");
@@ -869,47 +947,26 @@ namespace create {
   }
 
   float Create::getLeftWheelDistance() const {
-      return totalLeftDist;
+    return totalLeftDist;
   }
 
   float Create::getRightWheelDistance() const {
-      return totalRightDist;
+    return totalRightDist;
   }
 
   float Create::getRequestedLeftWheelVel() const {
-      if (data->isValidPacketID(ID_LEFT_VEL)) {
-          uint16_t uvel = GET_DATA(ID_LEFT_VEL);
-          int16_t vel;
-          std::memcpy(&vel, &uvel, sizeof(vel));
-          return (vel / 1000.0);
-      }
-      else {
-        CERR("[create::Create] ", "Left wheel velocity not supported!");
-        return 0;
-      }
+    return requestedLeftVel;
   }
 
   float Create::getRequestedRightWheelVel() const {
-      if (data->isValidPacketID(ID_RIGHT_VEL)) {
-        uint16_t uvel = GET_DATA(ID_RIGHT_VEL);
-        int16_t vel;
-        std::memcpy(&vel, &uvel, sizeof(vel));
-        return (vel / 1000.0);
-      }
-      else {
-        CERR("[create::Create] ", "Right wheel velocity not supported!");
-        return 0;
-      }
+    return requestedRightVel;
   }
 
-  create::CreateMode Create::getMode() const {
+  create::CreateMode Create::getMode() {
     if (data->isValidPacketID(ID_OI_MODE)) {
-      return (create::CreateMode) GET_DATA(ID_OI_MODE);
+      mode = (create::CreateMode) GET_DATA(ID_OI_MODE);
     }
-    else {
-      CERR("[create::Create] ", "Querying Mode not supported!");
-      return create::MODE_UNAVAILABLE;
-    }
+    return mode;
   }
 
   Pose Create::getPose() const {

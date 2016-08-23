@@ -47,39 +47,20 @@ POSSIBILITY OF SUCH DAMAGE.
 
 namespace create {
   class Serial {
-    private:
-      enum ReadState {
-        READ_HEADER,
-        READ_NBYTES,
-        READ_PACKET_ID,
-        READ_PACKET_BYTES,
-        READ_CHECKSUM
-      };
 
-      boost::shared_ptr<Data> data;
+    protected:
       boost::asio::io_service io;
       boost::asio::serial_port port;
+
+    private:
       boost::thread ioThread;
       boost::condition_variable dataReadyCond;
       boost::mutex dataReadyMut;
-      ReadState readState;
       bool dataReady;
       bool isReading;
       bool firstRead;
-
-      // These are for possible diagnostics
-      uint64_t corruptPackets;
-      uint64_t totalPackets;
-      // State machine variables
-      uint8_t headerByte;
-      uint8_t packetID;
-      uint8_t expectedNumBytes;
       uint8_t byteRead;
-      uint16_t packetBytes;
-      uint8_t numBytesRead;
-      uint32_t byteSum;
-      uint8_t numDataBytesRead;
-      uint8_t expectedNumDataBytes;
+
 
       // Callback executed when data arrives from Create
       void onData(const boost::system::error_code& e, const std::size_t& size);
@@ -88,11 +69,21 @@ namespace create {
       // Start and stop reading data from Create
       bool startReading();
       void stopReading();
+
+    protected:
+      boost::shared_ptr<Data> data;
+      // These are for possible diagnostics
+      uint64_t corruptPackets;
+      uint64_t totalPackets;
+
+      virtual bool startSensorStream() = 0;
+      virtual void processByte(uint8_t byteRead) = 0;
+
       // Notifies main thread that data is fresh and makes the user callback
       void notifyDataReady();
 
     public:
-      Serial(boost::shared_ptr<Data> data, const uint8_t& header = create::util::CREATE_2_HEADER);
+      Serial(boost::shared_ptr<Data> data);
       ~Serial();
       bool connect(const std::string& port, const int& baud = 115200, boost::function<void()> cb = 0);
       void disconnect();

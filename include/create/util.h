@@ -40,17 +40,12 @@ POSSIBILITY OF SUCH DAMAGE.
 namespace create {
   namespace util {
 
-    static const float CREATE_1_AXLE_LENGTH = 0.26;
-
-    static const uint8_t CREATE_2_HEADER = 19;
-    static const float CREATE_2_AXLE_LENGTH = 0.235;
-    static const float CREATE_2_TICKS_PER_REV = 508.8;
-    static const uint32_t CREATE_2_MAX_ENCODER_TICKS = 65535;
-    static const float CREATE_2_WHEEL_DIAMETER = 0.078;
-    static const float CREATE_2_MAX_VEL = 0.5;
-    static const float CREATE_2_MAX_RADIUS = 2.0;
-    static const float CREATE_2_STRAIGHT_RADIUS = 32.768;
-    static const float CREATE_2_IN_PLACE_RADUIS = 0.001;
+    static const uint8_t STREAM_HEADER = 19;
+    static const float V_3_TICKS_PER_REV = 508.8;
+    static const uint32_t V_3_MAX_ENCODER_TICKS = 65535;
+    static const float MAX_RADIUS = 2.0;
+    static const float STRAIGHT_RADIUS = 32.768;
+    static const float IN_PLACE_RADIUS = 0.001;
     static const float PI = 3.14159;
     static const float TWO_PI = 6.28318;
     static const float EPS = 0.0001;

@@ -37,7 +37,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <unistd.h>
 
-#include "create/serial.h"
+#include "create/serial_stream.h"
+#include "create/serial_query.h"
 #include "create/data.h"
 #include "create/types.h"
 #include "create/util.h"
@@ -68,6 +69,8 @@ namespace create {
       uint8_t powerLED;
       uint8_t powerLEDIntensity;
 
+      CreateMode mode;
+
       create::Pose pose;
       create::Vel vel;
 
@@ -79,6 +82,9 @@ namespace create {
       util::timestamp_t prevOnDataTime;
 
       Matrix poseCovar;
+
+      float requestedLeftVel;
+      float requestedRightVel;
 
       void init();
       // Add two matrices and handle overflow case
@@ -94,7 +100,7 @@ namespace create {
       /* Default constructor.
        * Does not attempt to establish serial connection to Create.
        */
-      Create(RobotModel = CREATE_2);
+      Create(RobotModel = RobotModel::CREATE_2);
 
       /* Attempts to establish serial connection to Create.
        * \param port of your computer that is connected to Create.
@@ -102,7 +108,7 @@ namespace create {
        *        115200 for Create 2 and 57600 for Create 1.
        * \param model type of robot.
        */
-      Create(const std::string& port, const int& baud, RobotModel model = CREATE_2);
+      Create(const std::string& port, const int& baud, RobotModel model = RobotModel::CREATE_2);
 
       ~Create();
 
@@ -152,21 +158,21 @@ namespace create {
        *                       turn in place clockwise = -CREATE_2_IN_PLACE_RADIUS
        * \return true if successful, false otherwise
        */
-      bool driveRadius(const float& velocity, const float& radius) const;
+      bool driveRadius(const float& velocity, const float& radius);
 
       /* Set the velocities for the left and right wheels.
        * \param leftWheel velocity in m/s.
        * \param rightWheel veloctiy in m/s.
        * \return true if successful, false otherwise
        */
-      bool driveWheels(const float& leftWheel, const float& rightWheel) const;
+      bool driveWheels(const float& leftWheel, const float& rightWheel);
 
       /* Set the forward and angular velocity of Create.
        * \param xVel in m/s
        * \param angularVel in rads/s
        * \return true if successful, false otherwise
        */
-      bool drive(const float& xVel, const float& angularVel) const;
+      bool drive(const float& xVel, const float& angularVel);
 
       /* Set the power to the side brush motor.
        * \param power is in the range [-1, 1]
@@ -453,10 +459,12 @@ namespace create {
       float getRightWheelDistance() const;
 
       /* Get the requested velocity (in meters/sec) of the left wheel.
+       * This value is bounded at the maximum velocity of the robot model.
        */
       float getRequestedLeftWheelVel() const;
 
       /* Get the requested velocity (in meters/sec) of the right wheel.
+       * This value is bounded at the maximum velocity of the robot model.
        */
       float getRequestedRightWheelVel() const;
 
@@ -466,7 +474,7 @@ namespace create {
 
       /* Get the current mode reported by Create.
        */
-      create::CreateMode getMode() const;
+      create::CreateMode getMode();
 
       /* Get the estimated position of Create based on wheel encoders.
        */

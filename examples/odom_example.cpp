@@ -5,10 +5,10 @@ create::Create* robot;
 int main(int argc, char** argv) {
   std::string port = "/dev/ttyUSB0";
   int baud = 115200;
-  create::RobotModel model = create::CREATE_2;
+  create::RobotModel model = create::RobotModel::CREATE_2;
 
   if (argc > 1 && std::string(argv[1]) == "create1") {
-    model = create::CREATE_1;
+    model = create::RobotModel::CREATE_1;
     baud = 57600;
     std::cout << "1st generation Create selected" << std::endl;
   }

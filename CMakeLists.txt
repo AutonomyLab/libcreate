@@ -13,8 +13,11 @@ include_directories(
 add_library(create
   src/create.cpp
   src/serial.cpp
+  src/serial_stream.cpp
+  src/serial_query.cpp
   src/data.cpp
   src/packet.cpp
+  src/types.cpp
 )
 
 if(THREADS_HAVE_PTHREAD_ARG)
