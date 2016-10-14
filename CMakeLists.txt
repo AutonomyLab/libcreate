@@ -6,8 +6,10 @@
 # Reference for this file:
 #   https://github.com/forexample/package-example/blob/cf2ea1d6a209fb9eca2ab83fdd0ac15fe4d3e807/Foo/CMakeLists.txt
 
-cmake_minimum_required(VERSION 3.0)
-project(libcreate VERSION 1.2.0)
+cmake_minimum_required(VERSION 2.8)
+project(libcreate)
+
+set(package_version 1.2.0)
 
 find_package(Boost REQUIRED system thread)
 find_package(Threads REQUIRED)
@@ -99,6 +101,7 @@ include(CMakePackageConfigHelpers)
 # Configure '<PROJECT-NAME>-config-version.cmake'
 write_basic_package_version_file(
   "${version_config}"
+  VERSION "${package_version}"
   COMPATIBILITY SameMajorVersion
 )
 
