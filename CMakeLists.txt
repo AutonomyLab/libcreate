@@ -6,7 +6,7 @@
 # Reference for this file:
 #   https://github.com/forexample/package-example/blob/cf2ea1d6a209fb9eca2ab83fdd0ac15fe4d3e807/Foo/CMakeLists.txt
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.12)
 project(libcreate)
 
 set(package_version 1.2.0)

@@ -1,3 +1,6 @@
+sudo: required
+dist: trusty
+
 language: cpp
 
 compiler:
@@ -8,5 +11,6 @@ before_install:
   - sudo apt-get install libboost-system-dev libboost-thread-dev
 
 script:
+  - cmake --version
   - cmake .
   - make
