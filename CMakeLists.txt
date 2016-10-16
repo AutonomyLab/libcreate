@@ -9,7 +9,7 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(libcreate)
 
-set(package_version 1.2.0)
+set(package_version 1.4.0)
 
 find_package(Boost REQUIRED system thread)
 find_package(Threads REQUIRED)
