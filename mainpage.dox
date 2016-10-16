@@ -1,0 +1,7 @@
+/**
+\mainpage
+\htmlinclude manifest.html
+
+\b libcreate is a C++ library for interfacing with iRobot's Create mobile robot platforms and various Roomba models.
+
+*/
