@@ -2,8 +2,8 @@
 Changelog for package libcreate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.4.0 (2016-10-16)
+------------------
 * Switch to trusty for CI
 * Set mimumum cmake version to 2.8.12
 * Update CMakeLists.txt configuration and install rules
