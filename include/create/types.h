@@ -45,8 +45,6 @@ namespace create {
     V_ALL = 0xFFFFFFFF
   };
 
-
-
   class RobotModel {
     public:
       bool operator==(RobotModel& other) const;
@@ -59,9 +57,20 @@ namespace create {
       float getMaxVelocity() const;
       float getWheelDiameter() const;
 
-      static RobotModel ROOMBA_400; // Roomba 400 series
-      static RobotModel CREATE_1; // Roomba 500 series
-      static RobotModel CREATE_2;   // Roomba 600 series
+      /**
+       * \brief Compatible with Roomba 400 series and earlier.
+       */
+      static RobotModel ROOMBA_400;
+
+      /**
+       * \brief Compatible with Create 1 or Roomba 500 series.
+       */
+      static RobotModel CREATE_1;
+
+      /**
+       * \brief Compatible with Create 2 or Roomba 600 series and greater.
+       */
+      static RobotModel CREATE_2;
 
     private:
       uint32_t id;
@@ -260,10 +269,17 @@ namespace create {
     IR_CHAR_VIRTUAL_WALL = 162
   };
 
+  /**
+   * \brief Represents a robot pose.
+   */
   struct Pose {
     float x;
     float y;
     float yaw;
+
+    /**
+     * \brief 3x3 covariance matrix in row-major order.
+     */
     std::vector<float> covariance;
   };
 
