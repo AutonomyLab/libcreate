@@ -97,52 +97,74 @@ namespace create {
       boost::shared_ptr<create::Serial> serial;
 
     public:
-      /* Default constructor.
-       * Does not attempt to establish serial connection to Create.
-       */
-      Create(RobotModel = RobotModel::CREATE_2);
+      /**
+       * \brief Default constructor.
+       *
+       * Calling this constructor Does not attempt to establish a serial connection to the robot.
+       *
+       * \param model the type of the robot. See RobotModel to determine the value for your robot.
+        */
+      Create(RobotModel model = RobotModel::CREATE_2);
 
-      /* Attempts to establish serial connection to Create.
+      /**
+       * \brief Attempts to establish serial connection to Create.
+       *
        * \param port of your computer that is connected to Create.
        * \param baud rate to communicate with Create. Typically,
        *        115200 for Create 2 and 57600 for Create 1.
-       * \param model type of robot.
+       * \param model type of robot. See RobotModel to determine the value for your robot.
        */
       Create(const std::string& port, const int& baud, RobotModel model = RobotModel::CREATE_2);
 
+      /**
+       * \brief Attempts to disconnect from serial.
+       */
       ~Create();
 
-      /* Make a serial connection to Create.
+      /**
+       * \brief Make a serial connection to Create.
+       *
        * This is the first thing that should be done after instantiated this class.
+       *
        * \return true if a successful connection is established, false otherwise.
        */
       bool connect(const std::string& port, const int& baud);
 
+      /**
+       * \brief Check if serial connection is active.
+       *
+       * \return true if successfully connected, false otherwise.
+       */
       inline bool connected() const { return serial->connected(); };
 
-      /* Disconnect from serial.
+      /**
+       * \brief Disconnect from serial.
        */
       void disconnect();
 
-      /* Change Create mode.
-       * \param mode to put Create in.
+      /**
+       * \brief Change Create mode.
+       * \param mode to change Create to.
        * \return true if successful, false otherwise
        */
       bool setMode(const create::CreateMode& mode);
 
-      /* Starts a cleaning mode.
+      /**
+       * \brief Starts a cleaning mode.
        * Changes mode to MODE_PASSIVE.
        * \return true if successful, false otherwise
        */
       bool clean(const create::CleanMode& mode = CLEAN_DEFAULT);
 
-      /* Starts the docking behaviour.
+      /**
+       * \brief Starts the docking behaviour.
        * Changes mode to MODE_PASSIVE.
        * \return true if successful, false otherwise
        */
       bool dock() const;
 
-      /* Sets the internal clock of Create.
+      /**
+       * \brief Sets the internal clock of Create.
        * \param day in range [0, 6]
        * \param hour in range [0, 23]
        * \param min in range [0, 59]
@@ -150,7 +172,8 @@ namespace create {
        */
       bool setDate(const create::DayOfWeek& day, const uint8_t& hour, const uint8_t& min) const;
 
-      /* Set the average wheel velocity and turning radius of Create.
+      /**
+       * \brief Set the average wheel velocity and turning radius of Create.
        * \param velocity is in m/s bounded between [-0.5, 0.5]
        * \param radius in meters.
        *        Special cases: drive straight = CREATE_2_STRAIGHT_RADIUS,
@@ -160,39 +183,45 @@ namespace create {
        */
       bool driveRadius(const float& velocity, const float& radius);
 
-      /* Set the velocities for the left and right wheels.
+      /**
+       * \brief Set the velocities for the left and right wheels.
        * \param leftWheel velocity in m/s.
        * \param rightWheel veloctiy in m/s.
        * \return true if successful, false otherwise
        */
       bool driveWheels(const float& leftWheel, const float& rightWheel);
 
-      /* Set the forward and angular velocity of Create.
+      /**
+       * \brief Set the forward and angular velocity of Create.
        * \param xVel in m/s
        * \param angularVel in rads/s
        * \return true if successful, false otherwise
        */
       bool drive(const float& xVel, const float& angularVel);
 
-      /* Set the power to the side brush motor.
+      /**
+       * \brief Set the power to the side brush motor.
        * \param power is in the range [-1, 1]
        * \return true if successful, false otherwise
        */
       bool setSideMotor(const float& power);
 
-      /* Set the power to the main brush motor.
+      /**
+       * \brief Set the power to the main brush motor.
        * \param power is in the range [-1, 1]
        * \return true if successful, false otherwise
        */
       bool setMainMotor(const float& power);
 
-      /* Set the power to the vacuum motor.
+      /**
+       * \brief Set the power to the vacuum motor.
        * \param power is in the range [0, 1]
        * \return true if successful, false otherwise
        */
       bool setVacuumMotor(const float& power);
 
-      /* Set the power of all motors.
+      /**
+       * \brief Set the power of all motors.
        * \param mainPower in the range [-1, 1]
        * \param sidePower in the range [-1, 1]
        * \param vacuumPower in the range [0, 1]
@@ -200,38 +229,46 @@ namespace create {
        */
       bool setAllMotors(const float& mainPower, const float& sidePower, const float& vacuumPower);
 
-      /* Set the blue "debris" LED on/off.
+      /**
+       * \brief Set the blue "debris" LED on/off.
        * \param enable
        * \return true if successful, false otherwise
        */
       bool enableDebrisLED(const bool& enable);
 
-      /* Set the green "spot" LED on/off.
+      /**
+       * \brief Set the green "spot" LED on/off.
        * \param enable
        * \return true if successful, false otherwise
        */
       bool enableSpotLED(const bool& enable);
 
-      /* Set the green "dock" LED on/off.
+      /**
+       * \brief Set the green "dock" LED on/off.
        * \param enable
        * \return true if successful, false otherwise
        */
       bool enableDockLED(const bool& enable);
 
-      /* Set the orange "check Create" LED on/off.
+      /**
+       * \brief Set the orange "check Create" LED on/off.
        * \param enable
        * \return true if successful, false otherwise
        */
       bool enableCheckRobotLED(const bool& enable);
 
-      /* Set the center power LED.
+      /**
+       * \brief Set the center power LED.
        * \param power in range [0, 255] where 0 = green and 255 = red
        * \param intensity in range [0, 255]
        * \return true if successful, false otherwise
        */
       bool setPowerLED(const uint8_t& power, const uint8_t& intensity = 255);
 
-      /* Set the four 7-segment display digits from left to right.
+      /**
+       * \brief Set the four 7-segment display digits from left to right.
+       *
+       * \todo This function is not yet implemented refer to https://github.com/AutonomyLab/libcreate/issues/7
        * \param segments to enable (true) or disable (false).
        *        The size of segments should be less than 29.
        *        The ordering of segments is left to right, top to bottom for each digit:
@@ -245,10 +282,10 @@ namespace create {
        *
        * \return true if successful, false otherwise
        */
-      //TODO (https://github.com/AutonomyLab/libcreate/issues/7)
-      //bool setDigits(const std::vector<bool>& segments) const;
+      bool setDigits(const std::vector<bool>& segments) const;
 
-      /* Set the four 7-segment display digits from left to right with ASCII codes.
+      /**
+       * \brief Set the four 7-segment display digits from left to right with ASCII codes.
        * Any code out side the accepted ascii ranges results in blank display.
        * \param digit1 is left most digit with ascii range [32, 126]
        * \param digit2 is second to left digit with ascii range [32, 126]
@@ -259,7 +296,8 @@ namespace create {
       bool setDigitsASCII(const uint8_t& digit1, const uint8_t& digit2,
                           const uint8_t& digit3, const uint8_t& digit4) const;
 
-      /* Defines a song from the provided notes and labels it with a song number.
+      /**
+       * \brief Defines a song from the provided notes and labels it with a song number.
        * \param songNumber can be one of four possible song slots, [0, 4]
        * \param songLength is the number of notes, maximum 16.
        *        length(notes) = length(durations) = songLength should be true.
@@ -273,226 +311,299 @@ namespace create {
                       const uint8_t* notes,
                       const float* durations) const;
 
-      /* Play a previously created song.
+      /**
+       * \brief Play a previously created song.
        * This command will not work if a song was not already defined with the specified song number.
        * \param songNumber is one of four stored songs in the range [0, 4]
        * \return true if successful, false otherwise
        */
       bool playSong(const uint8_t& songNumber) const;
 
-      /* True if a left or right wheeldrop is detected.
+      /**
+       * \return true if a left or right wheeldrop is detected, false otherwise.
        */
       bool isWheeldrop() const;
 
-      /* Returns true if left bumper is pressed, false otherwise.
+      /**
+       * \return true if left bumper is pressed, false otherwise.
        */
       bool isLeftBumper() const;
 
-      /* Returns true if right bumper is pressed, false otherwise.
+      /**
+       * \return true if right bumper is pressed, false otherwise.
        */
       bool isRightBumper() const;
 
-      /* True if wall is seen to right of Create, false otherwise.
+      /**
+       * \return true if wall is seen to right of Create, false otherwise.
        */
       bool isWall() const;
 
-      /* True if there are any cliff detections, false otherwise.
+      /**
+       * \return true if there are any cliff detections, false otherwise.
        */
       bool isCliff() const;
 
-      /* True if there is a virtual wall signal is being received.
+      /**
+       * \return true if there is a virtual wall signal is being received.
        */
       bool isVirtualWall() const;
 
-      //TODO (https://github.com/AutonomyLab/libcreate/issues/8)
-      //bool isWheelOvercurrent() const;
+      /**
+       * \todo Not implemented yet (https://github.com/AutonomyLab/libcreate/issues/8)
+       * \return true if drive motors are overcurrent.
+       */
+      bool isWheelOvercurrent() const;
 
-      //TODO (https://github.com/AutonomyLab/libcreate/issues/8)
-      //bool isMainBrushOvercurrent() const;
+      /**
+       * \todo Not implemented yet (https://github.com/AutonomyLab/libcreate/issues/8)
+       * \return true if main brush motor is overcurrent.
+       */
+      bool isMainBrushOvercurrent() const;
 
-      //TODO (https://github.com/AutonomyLab/libcreate/issues/8)
-      //bool isSideBrushOvercurrent() const;
+      /**
+       * \todo Not implemented yet (https://github.com/AutonomyLab/libcreate/issues/8)
+       * \return true if side brush motor is overcurrent.
+       */
+      bool isSideBrushOvercurrent() const;
 
-      /* Get level of the dirt detect sensor.
+      /**
+       * \brief Get level of the dirt detect sensor.
        * \return value in range [0, 255]
        */
       uint8_t getDirtDetect() const;
 
-      /* Get value of 8-bit IR character currently being received by omnidirectional sensor.
+      /**
+       * \brief Get value of 8-bit IR character currently being received by omnidirectional sensor.
        * \return value in range [0, 255]
        */
       uint8_t getIROmni() const;
 
-      /* Get value of 8-bit IR character currently being received by left sensor.
+      /**
+       * \brief Get value of 8-bit IR character currently being received by left sensor.
        * \return value in range [0, 255]
        */
 
       uint8_t getIRLeft() const;
 
-      /* Get value of 8-bit IR character currently being received by right sensor.
+      /**
+       * \brief Get value of 8-bit IR character currently being received by right sensor.
        * \return value in range [0, 255]
        */
       uint8_t getIRRight() const;
 
-      /* Get state of 'clean' button ('play' button on Create 1).
+      /**
+       * \brief Get state of 'clean' button ('play' button on Create 1).
+       * \return true if button is pressed, false otherwise.
        */
       bool isCleanButtonPressed() const;
 
-      /* Not supported by any firmware!
+      /**
+       * \brief Not supported by any firmware!
        */
       bool isClockButtonPressed() const;
 
-      /* Not supported by any firmware!
+      /**
+       * \brief Not supported by any firmware!
        */
       bool isScheduleButtonPressed() const;
 
-      /* Get state of 'day' button.
+      /**
+       * \brief Get state of 'day' button.
+       * \return true if button is pressed, false otherwise.
        */
       bool isDayButtonPressed() const;
 
-      /* Get state of 'hour' button.
+      /**
+       * \brief Get state of 'hour' button.
+       * \return true if button is pressed, false otherwise.
        */
       bool isHourButtonPressed() const;
 
-      /* Get state of 'min' button.
+      /**
+       * \brief Get state of 'min' button.
+       * \return true if button is pressed, false otherwise.
        */
       bool isMinButtonPressed() const;
 
-      /* Get state of 'dock' button ('advance' button on Create 1).
+      /**
+       * \brief Get state of 'dock' button ('advance' button on Create 1).
+       * \return true if button is pressed, false otherwise.
        */
       bool isDockButtonPressed() const;
 
-      /* Get state of 'spot' button.
+      /**
+       * \brief Get state of 'spot' button.
+       * \return true if button is pressed, false otherwise.
        */
       bool isSpotButtonPressed() const;
 
-      /* Get battery voltage.
+      /**
+       * \brief Get battery voltage.
        * \return value in volts
        */
       float getVoltage() const;
 
-      /* Get current flowing in/out of battery.
+      /**
+       * \brief Get current flowing in/out of battery.
        * A positive current implies Create is charging.
        * \return value in amps
        */
       float getCurrent() const;
 
-      /* Get the temperature of battery.
+      /**
+       * \brief Get the temperature of battery.
        * \return value in Celsius
        */
       int8_t getTemperature() const;
 
-      /* Get battery's remaining charge.
+      /**
+       * \brief Get battery's remaining charge.
        * \return value in amp-hours
        */
       float getBatteryCharge() const;
 
-      /* Get estimated battery charge capacity.
+      /**
+       * \brief Get estimated battery charge capacity.
        * \return in amp-hours
        */
       float getBatteryCapacity() const;
 
-      /* Return true if farthest left light sensor detects an obstacle, false otherwise.
+      /**
+       * \return true if farthest left light sensor detects an obstacle, false otherwise.
        */
       bool isLightBumperLeft() const;
 
-      /* Return true if front left light sensor detects an obstacle, false otherwise.
+      /**
+       * \return true if front left light sensor detects an obstacle, false otherwise.
        */
       bool isLightBumperFrontLeft() const;
 
-      /* Return true if center left light sensor detects an obstacle, false otherwise.
+      /**
+       * \return true if center left light sensor detects an obstacle, false otherwise.
        */
       bool isLightBumperCenterLeft() const;
 
-      /* Return true if farthest right light sensor detects an obstacle, false otherwise.
+      /**
+       * \return true if farthest right light sensor detects an obstacle, false otherwise.
        */
       bool isLightBumperRight() const;
 
-      /* Return true if front right light sensor detects an obstacle, false otherwise.
+      /**
+       * \return true if front right light sensor detects an obstacle, false otherwise.
        */
       bool isLightBumperFrontRight() const;
 
-      /* Return true if center right light sensor detects an obstacle, false otherwise.
+      /**
+       * \return true if center right light sensor detects an obstacle, false otherwise.
        */
       bool isLightBumperCenterRight() const;
 
-      /* Return the signal strength from the left light sensor.
+      /**
+       * \brief Get the signal strength from the left light sensor.
        * \return value in range [0, 4095]
        */
       uint16_t getLightSignalLeft() const;
 
-      /* Return the signal strength from the front-left light sensor.
+      /**
+       * \brief Get the signal strength from the front-left light sensor.
        * \return value in range [0, 4095]
        */
       uint16_t getLightSignalFrontLeft() const;
 
-      /* Return the signal strength from the center-left light sensor.
+      /**
+       * \brief Get the signal strength from the center-left light sensor.
        * \return value in range [0, 4095]
        */
       uint16_t getLightSignalCenterLeft() const;
 
-      /* Return the signal strength from the right light sensor.
+      /**
+       * \brief Get the signal strength from the right light sensor.
        * \return value in range [0, 4095]
        */
       uint16_t getLightSignalRight() const;
 
-      /* Return the signal strength from the front-right light sensor.
+      /**
+       * \brief Get the signal strength from the front-right light sensor.
        * \return value in range [0, 4095]
        */
       uint16_t getLightSignalFrontRight() const;
 
-      /* Return the signal strength from the center-right light sensor.
+      /**
+       * \brief Get the signal strength from the center-right light sensor.
        * \return value in range [0, 4095]
        */
       uint16_t getLightSignalCenterRight() const;
 
-      /* Return true if Create is moving forward, false otherwise.
+      /**
+       * \return true if Create is moving forward, false otherwise.
        */
       bool isMovingForward() const;
 
-      /* Get the total distance (in meters) the left wheel has moved.
+      /**
+       * \brief Get the total distance the left wheel has moved.
+       * \return distance in meters.
        */
       float getLeftWheelDistance() const;
 
-      /* Get the total distance (in meters) the right wheel has moved.
+      /**
+       * \brief Get the total distance the right wheel has moved.
+       * \return distance in meters.
        */
       float getRightWheelDistance() const;
 
-      /* Get the requested velocity (in meters/sec) of the left wheel.
+      /**
+       * \brief Get the requested velocity of the left wheel.
        * This value is bounded at the maximum velocity of the robot model.
+       * \return requested velocity in m/s.
        */
       float getRequestedLeftWheelVel() const;
 
-      /* Get the requested velocity (in meters/sec) of the right wheel.
+      /**
+       * \brief Get the requested velocity of the right wheel.
        * This value is bounded at the maximum velocity of the robot model.
+       * \return requested velocity in m/s.
        */
       float getRequestedRightWheelVel() const;
 
-      /* Get the current charging state.
+      /**
+       * \brief Get the current charging state.
+       * \return charging state.
        */
       create::ChargingState getChargingState() const;
 
-      /* Get the current mode reported by Create.
+      /**
+       * \brief Get the current mode reported by Create.
+       * \return mode.
        */
       create::CreateMode getMode();
 
-      /* Get the estimated position of Create based on wheel encoders.
+      /**
+       * \brief Get the estimated pose of Create based on wheel encoders.
+       * \return pose (x-y position in meters and yaw angle in Radians)
        */
       create::Pose getPose() const;
 
-      /* Get the estimated velocity of Create based on wheel encoders.
+      /**
+       * \brief Get the estimated velocity of Create based on wheel encoders.
+       * \return velocity (x and y in m/s and angular velocity in Radians/s)
        */
       create::Vel getVel() const;
 
-      /* Get the number of corrupt serial packets since first connecting to Create.
+      /**
+       * \brief Get the number of corrupt serial packets since first connecting to Create.
+       * This value is ideally zero. If the number is consistently increasing then
+       * chances are some sensor information is not being updated.
+       * \return number of corrupt packets.
        */
       uint64_t getNumCorruptPackets() const;
 
-      /* Get the total number of serial packets (including corrupt packets) since first connecting to Create.
+      /**
+       * \brief Get the total number of serial packets received (including corrupt packets) since first connecting to Create.
+       * \return total number of serial packets.
        */
       uint64_t getTotalPackets() const;
   };  // end Create class
 
 }  // namespace create
-
 #endif  // CREATE_DRIVER_H
