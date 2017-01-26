@@ -562,10 +562,20 @@ namespace create {
     uint8_t cmd[2] = { OC_PLAY, songNumber };
     return serial->send(cmd, 2);
   }
-
-  bool Create::isWheeldrop() const {
+  
+    bool Create::isLeftWheel() const {
     if (data->isValidPacketID(ID_BUMP_WHEELDROP)) {
-      return (GET_DATA(ID_BUMP_WHEELDROP) & 0x0C) != 0;
+      return (GET_DATA(ID_BUMP_WHEELDROP) & 0x08) != 0;
+    }
+    else {
+      CERR("[create::Create] ", "Wheeldrop sensor not supported!");
+      return false;
+    }
+  }
+
+  bool Create::isRightWheel() const {
+    if (data->isValidPacketID(ID_BUMP_WHEELDROP)) {
+      return (GET_DATA(ID_BUMP_WHEELDROP) & 0x04) != 0;
     }
     else {
       CERR("[create::Create] ", "Wheeldrop sensor not supported!");
@@ -603,15 +613,39 @@ namespace create {
     }
   }
 
-  bool Create::isCliff() const {
-    if (data->isValidPacketID(ID_CLIFF_LEFT) &&
-        data->isValidPacketID(ID_CLIFF_FRONT_LEFT) &&
-        data->isValidPacketID(ID_CLIFF_FRONT_RIGHT) &&
-        data->isValidPacketID(ID_CLIFF_RIGHT)) {
-      return GET_DATA(ID_CLIFF_LEFT) == 1 ||
-             GET_DATA(ID_CLIFF_FRONT_LEFT) == 1 ||
-             GET_DATA(ID_CLIFF_FRONT_RIGHT) == 1 ||
-             GET_DATA(ID_CLIFF_RIGHT) == 1;
+  bool Create::isCliffLeft() const {
+    if (data->isValidPacketID(ID_CLIFF_LEFT)) {
+      return GET_DATA(ID_CLIFF_LEFT);
+    }
+    else {
+      CERR("[create::Create] ", "Cliff sensors not supported!");
+      return false;
+    }
+  }
+
+  bool Create::isCliffFrontLeft() const {
+    if (data->isValidPacketID(ID_CLIFF_FRONT_LEFT)) {
+      return GET_DATA(ID_CLIFF_FRONT_LEFT);
+    }
+    else {
+      CERR("[create::Create] ", "Cliff sensors not supported!");
+      return false;
+    }
+  }
+
+  bool Create::isCliffFrontRight() const {
+    if (data->isValidPacketID(ID_CLIFF_FRONT_RIGHT)) {
+      return GET_DATA(ID_CLIFF_FRONT_RIGHT);
+    }
+    else {
+      CERR("[create::Create] ", "Cliff sensors not supported!");
+      return false;
+    }
+  }
+
+  bool Create::isCliffRight() const {
+    if (data->isValidPacketID(ID_CLIFF_RIGHT)) {
+      return GET_DATA(ID_CLIFF_RIGHT);
     }
     else {
       CERR("[create::Create] ", "Cliff sensors not supported!");
@@ -814,6 +848,46 @@ namespace create {
       CERR("[create::Create] ", "Battery capacity not supported!");
       return 0;
     }
+  }
+  
+  	  uint16_t Create::getCliffSignalLeft() const {
+	  if (data->isValidPacketID(ID_CLIFF_LEFT_SIGNAL)) {
+		  return GET_DATA(ID_CLIFF_LEFT_SIGNAL);
+	  }
+	  else {
+		  CERR("[create::Create] ", "Cliff sensors not supported!");
+		  return 0;
+	  }
+  }
+
+  uint16_t Create::getCliffSignalFrontLeft() const {
+	  if (data->isValidPacketID(ID_CLIFF_FRONT_LEFT_SIGNAL)) {
+		  return GET_DATA(ID_CLIFF_FRONT_LEFT_SIGNAL);
+	  }
+	  else {
+		  CERR("[create::Create] ", "Cliff sensors not supported!");
+		  return 0;
+	  }
+  }
+
+  uint16_t Create::getCliffSignalFrontRight() const {
+	  if (data->isValidPacketID(ID_CLIFF_FRONT_RIGHT_SIGNAL)) {
+		  return GET_DATA(ID_CLIFF_FRONT_RIGHT_SIGNAL);
+	  }
+	  else {
+		  CERR("[create::Create] ", "Cliff sensors not supported!");
+		  return 0;
+	  }
+  }
+
+  uint16_t Create::getCliffSignalRight() const {
+	  if (data->isValidPacketID(ID_CLIFF_RIGHT_SIGNAL)) {
+		  return GET_DATA(ID_CLIFF_RIGHT_SIGNAL);
+	  }
+	  else {
+		  CERR("[create::Create] ", "Cliff sensors not supported!");
+		  return 0;
+	  }
   }
 
   bool Create::isLightBumperLeft() const {
