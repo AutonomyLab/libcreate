@@ -424,6 +424,27 @@ namespace create {
     }
   }
 
+  bool Create::driveWheelsPwm(const float& leftWheel, const float& rightWheel)
+  {
+    static const int16_t PWM_COUNTS = 255;
+
+    if (leftWheel < -1.0 || leftWheel > 1.0 ||
+        rightWheel < -1.0 || rightWheel > 1.0)
+      return false;
+
+    int16_t leftPwm = roundf(leftWheel * PWM_COUNTS);
+    int16_t rightPwm = roundf(rightWheel * PWM_COUNTS);
+
+    uint8_t cmd[5] = { OC_DRIVE_PWM,
+                        rightPwm >> 8,
+                        rightPwm & 0xff,
+                        leftPwm >> 8,
+                        leftPwm & 0xff
+                       };
+
+    return serial->send(cmd, 5);
+  }
+
   bool Create::drive(const float& xVel, const float& angularVel) {
     // Compute left and right wheel velocities
     float leftVel = xVel - ((model.getAxleLength() / 2.0) * angularVel);

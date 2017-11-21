@@ -192,6 +192,14 @@ namespace create {
       bool driveWheels(const float& leftWheel, const float& rightWheel);
 
       /**
+       * \brief Set the direct  for the left and right wheels.
+       * \param leftWheel pwm in the range [-1, 1]
+       * \param rightWheel pwm in the range [-1, 1]
+       * \return true if successful, false otherwise
+       */
+      bool driveWheelsPwm(const float& leftWheel, const float& rightWheel);
+
+      /**
        * \brief Set the forward and angular velocity of Create.
        * \param xVel in m/s
        * \param angularVel in rads/s
