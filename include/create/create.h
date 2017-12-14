@@ -191,6 +191,8 @@ namespace create {
        */
       bool driveWheels(const float& leftWheel, const float& rightWheel);
 
+      bool driveWheelsPWM(const int16_t& leftWheelPWM, const int16_t& rightWheelPWM);
+
       /**
        * \brief Set the forward and angular velocity of Create.
        * \param xVel in m/s
