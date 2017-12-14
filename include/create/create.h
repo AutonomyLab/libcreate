@@ -83,6 +83,8 @@ namespace create {
 
       Matrix poseCovar;
 
+      float measuredLeftVel;
+      float measuredRightVel;
       float requestedLeftVel;
       float requestedRightVel;
 
@@ -559,6 +561,18 @@ namespace create {
        * \return distance in meters.
        */
       float getRightWheelDistance() const;
+
+      /**
+       * \brief Get the measured velocity of the left wheel.
+       * \return velocity in m/s
+       */
+      float getMeasuredLeftWheelVel() const;
+
+      /**
+       * \brief Get the measured velocity of the right wheel.
+       * \return velocity in m/s
+       */
+      float getMeasuredRightWheelVel() const;
 
       /**
        * \brief Get the requested velocity of the left wheel.

@@ -170,6 +170,9 @@ namespace create {
       deltaYaw = wheelDistDiff / model.getAxleLength();
     }
 
+    measuredLeftVel = leftWheelDist / dt;
+    measuredRightVel = rightWheelDist / dt;
+
     // Moving straight
     if (fabs(wheelDistDiff) < util::EPS) {
       deltaX = deltaDist * cos(pose.yaw);
@@ -973,6 +976,14 @@ namespace create {
 
   float Create::getRightWheelDistance() const {
     return totalRightDist;
+  }
+
+  float Create::getMeasuredLeftWheelVel() const {
+    return measuredLeftVel;
+  }
+
+  float Create::getMeasuredRightWheelVel() const {
+    return measuredRightVel;
   }
 
   float Create::getRequestedLeftWheelVel() const {
