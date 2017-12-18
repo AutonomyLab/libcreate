@@ -2,8 +2,8 @@
 Changelog for package libcreate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.5.0 (2017-12-17)
+------------------
 * Add APIs for getting the measured velocities of the wheels
 * Add ability to drive the wheels with direct pwm duty
 * Update documentation
