@@ -2,6 +2,16 @@
 Changelog for package libcreate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add APIs for getting the measured velocities of the wheels
+* Add ability to drive the wheels with direct pwm duty
+* Update documentation
+* Add mainpage.dox
+* Use package.xml format 2
+* Add doxygen as doc dependency
+* Contributors: Erik Schembor, Jacob Perron
+
 1.4.0 (2016-10-16)
 ------------------
 * Switch to trusty for CI
