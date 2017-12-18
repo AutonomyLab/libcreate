@@ -1,4 +1,10 @@
 @PACKAGE_INIT@
+find_package(Boost REQUIRED COMPONENTS system thread)
+find_package(Threads REQUIRED)
 
-include("${CMAKE_CURRENT_LIST_DIR}/@targets_export_name@.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/@TARGETS_EXPORT_NAME@.cmake")
+set_and_check(libcreate_INCLUDE_DIRS "@PACKAGE_INCLUDE_INSTALL_DIR@")
+list(APPEND libcreate_INCLUDE_DIRS "${Boost_INCLUDE_DIRS}")
+set(libcreate_LIBRARIES "@LIBRARY_NAME@")
+list(APPEND libcreate_LIBRARIES "${Boost_LIBRARIES}")
 check_required_components("@PROJECT_NAME@")
