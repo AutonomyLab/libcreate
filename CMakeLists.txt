@@ -51,23 +51,24 @@ target_link_libraries(${LIBRARY_NAME}
 )
 
 # Declare example executables
-add_executable(create_demo examples/create_demo.cpp)
-add_executable(bumper_example examples/bumper_example.cpp)
-add_executable(odom_example examples/odom_example.cpp)
+set(EXAMPLES
+  battery_level
+  bumpers
+  drive_circle
+  leds
+  packets
+  play_song
+  wheeldrop
+)
 
-# Specify libraries to link executable targets against
-target_link_libraries(create_demo
-  ${Boost_LIBRARIES}
-  ${LIBRARY_NAME}
-)
-target_link_libraries(bumper_example
-  ${Boost_LIBRARIES}
-  ${LIBRARY_NAME}
-)
-target_link_libraries(odom_example
-  ${Boost_LIBRARIES}
-  ${LIBRARY_NAME}
-)
+foreach(EXAMPLE ${EXAMPLES})
+  add_executable(${EXAMPLE} examples/${EXAMPLE}.cpp)
+
+  target_link_libraries(${EXAMPLE}
+    ${Boost_LIBRARIES}
+    ${LIBRARY_NAME}
+  )
+endforeach()
 
 #################
 # Configuration #
