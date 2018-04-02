@@ -41,6 +41,10 @@ namespace create {
       mutable boost::mutex dataMutex;
       mutable boost::mutex tmpDataMutex;
 
+    protected:
+      // Thread safe
+      void setData(const uint16_t& d);
+
     public:
       const uint8_t nbytes;
       const std::string info;
@@ -48,10 +52,11 @@ namespace create {
       Packet(const uint8_t& nbytes, const std::string& info);
       ~Packet();
 
-      // All of the following are thread safe
-      void setTempData(const uint16_t& td);
+      // Thread safe
+      void setDataToValidate(const uint16_t& td);
+      // Thread safe
       void validate();
-      void setData(const uint16_t& d);
+      // Thread safe
       uint16_t getData() const;
   };
 

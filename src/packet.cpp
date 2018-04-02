@@ -10,7 +10,7 @@ namespace create {
 
   Packet::~Packet() { }
 
-  void Packet::setTempData(const uint16_t& tmp) {
+  void Packet::setDataToValidate(const uint16_t& tmp) {
     boost::mutex::scoped_lock lock(tmpDataMutex);
     tmpData = tmp;
   }
