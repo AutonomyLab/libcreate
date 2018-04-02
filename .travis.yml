@@ -14,3 +14,5 @@ script:
   - cmake --version
   - cmake .
   - make
+  - export GTEST_OUTPUT="xml:test_results/" 
+  - make test
