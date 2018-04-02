@@ -1,4 +1,4 @@
-# After installation this project can be found  by 'find_package' command:
+# After installation this project can be found by 'find_package' command:
 #
 #    find_package(libcreate REQUIRED)
 #    include_directores(${libcreate_INCLUDE_DIRS})
@@ -9,6 +9,8 @@ cmake_minimum_required(VERSION 2.8.12)
 project(libcreate)
 
 set(PACKAGE_VERSION 1.5.0)
+
+option(LIBCREATE_BUILD_TESTS "Enable the build of tests." ON)
 
 find_package(Boost REQUIRED COMPONENTS system thread)
 find_package(Threads REQUIRED)
@@ -149,3 +151,68 @@ install(
   FILES package.xml
   DESTINATION ${SHARE_INSTALL_DIR}
 )
+
+###########
+# Testing #
+###########
+
+if(LIBCREATE_BUILD_TESTS)
+  enable_testing()
+
+  # Download and unpack googletest at configure time
+  configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
+  execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+    RESULT_VARIABLE GTEST_DOWNLOAD_RESULT
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download
+  )
+
+  if(GTEST_DOWNLOAD_RESULT)
+    message(FATAL_ERROR "CMake step for googletest failed: ${GTEST_DOWNLOAD_RESULT}")
+  endif()
+
+  # Build googletest
+  execute_process(COMMAND ${CMAKE_COMMAND} --build .
+    RESULT_VARIABLE GTEST_BUILD_RESULT
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download
+  )
+
+  if(GTEST_BUILD_RESULT)
+    message(FATAL_ERROR "Build step for googletest failed: ${GTEST_BUILD_RESULT}")
+  endif()
+
+  # Add googletest directly to our build. This defines the gtest and gtest_main targets.
+  add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
+                   ${CMAKE_BINARY_DIR}/googletest-build)
+
+  # The gtest/gtest_main targets carry header search path
+  # dependencies automatically when using CMake 2.8.11 or
+  # later. Otherwise we have to add them here ourselves.
+  if (CMAKE_VERSION VERSION_LESS 2.8.11)
+    include_directories("${gtest_SOURCE_DIR}/include")
+  endif()
+
+  # Add tests
+  set(LIBCREATE_TESTS
+    test_create
+    test_data
+    test_packet
+    test_robot_model
+    test_serial_stream
+    test_serial_query
+  )
+
+  foreach(LIBCREATE_TEST ${LIBCREATE_TESTS})
+    add_executable(${LIBCREATE_TEST} tests/${LIBCREATE_TEST}.cpp)
+
+    target_link_libraries(${LIBCREATE_TEST}
+      # ${Boost_LIBRARIES}
+      ${LIBRARY_NAME}
+      gtest_main
+    )
+
+    add_test(
+      NAME ${LIBCREATE_TEST}
+      COMMAND ${LIBCREATE_TEST}
+    )
+  endforeach()
+endif()
