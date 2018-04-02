@@ -33,8 +33,6 @@ namespace create {
     ADD_PACKET(ID_OI_MODE, 1, "oi_mode", V_2 | V_3);
     ADD_PACKET(ID_LEFT_ENC, 2, "enc_counts_left", V_3);
     ADD_PACKET(ID_RIGHT_ENC, 2, "enc_counts_right", V_3);
-    ADD_PACKET(ID_LEFT_ENC, 2, "enc_counts_left", V_3);
-    ADD_PACKET(ID_RIGHT_ENC, 2, "enc_counts_right", V_3);
     ADD_PACKET(ID_LIGHT, 1, "light_bumper", V_3);
     ADD_PACKET(ID_LIGHT_LEFT, 2, "light_bumper_left", V_3);
     ADD_PACKET(ID_LIGHT_FRONT_LEFT, 2, "light_bumper_front_left", V_3);
