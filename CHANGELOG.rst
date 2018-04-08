@@ -2,6 +2,28 @@
 Changelog for package libcreate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add unit tests (gtests)
+* Refactor Packet API
+    * Declare setData member as protected
+    * Rename 'setTempData' to 'setDataToValidate'
+* Remove redundant packets from Data constructor
+* Updated setDigits function API comments
+    * added HTML to adjust for spacing in diagram, showing the proper ordering of segments.
+* Update examples
+    * More concise and focusing on individual features:
+        * Battery level
+        * Bumpers
+        * Drive circle
+        * LEDs
+        * Serial packets
+        * Play song
+        * Wheeldrop
+* Update README
+* Refactor cmake files
+* Contributors: Jacob Perron, K.Moriarty
+
 1.5.0 (2017-12-17)
 ------------------
 * Add APIs for getting the measured velocities of the wheels
