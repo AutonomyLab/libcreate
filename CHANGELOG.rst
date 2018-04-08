@@ -2,8 +2,8 @@
 Changelog for package libcreate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.6.0 (2018-04-07)
+------------------
 * Add unit tests (gtests)
 * Refactor Packet API
     * Declare setData member as protected
