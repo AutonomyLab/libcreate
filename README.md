@@ -18,6 +18,18 @@ C++ library for interfacing with iRobot's [Create 1 and 2](http://www.irobot.com
 
 * [Boost System Library](http://www.boost.org/doc/libs/1_59_0/libs/system/doc/index.html)
 * [Boost Thread Library](http://www.boost.org/doc/libs/1_59_0/doc/html/thread.html)
+* [Optional] [googletest](https://github.com/google/googletest)
+
+### Install ###
+
+        sudo apt-get install build-essential cmake libboost-system-dev libboost-thread-dev
+
+        # Optionally, install gtest for building unit tests
+        sudo apt-get install libgtest-dev
+        cd /usr/src/gtest
+        sudo cmake CMakeLists.txt
+        sudo make
+        sudo cp *.a /usr/lib
 
 #### Serial Permissions ####
 
@@ -47,6 +59,12 @@ Note, the examples found in the "examples" directory are built with the library.
         cd src
         git clone https://github.com/AutonomyLab/libcreate.git
         catkin build
+
+## Running Tests ##
+
+To run unit tests, execute the following in the build directory:
+
+        make test
 
 ## Known Issues ##
 
