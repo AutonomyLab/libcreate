@@ -16,8 +16,6 @@
 
   <buildtool_depend>cmake</buildtool_depend>
 
-  <build_depend>git</build_depend>
-
   <depend>boost</depend>
 
   <exec_depend>catkin</exec_depend>
