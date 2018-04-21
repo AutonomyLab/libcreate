@@ -8,7 +8,7 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(libcreate)
 
-set(PACKAGE_VERSION 1.6.0)
+set(PACKAGE_VERSION 1.6.1)
 
 option(LIBCREATE_BUILD_TESTS "Enable the build of tests." ON)
 

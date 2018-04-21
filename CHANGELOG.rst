@@ -1,8 +1,8 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package libcreate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Forthcoming
------------
+1.6.1 (2018-04-21)
+------------------
 * Build and install gtest as part of CI
 * Update README with instructions for building and running unit tests
 * Remove external cmake project for gtest
