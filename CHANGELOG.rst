@@ -1,6 +1,14 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package libcreate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Forthcoming
+-----------
+* Build and install gtest as part of CI
+* Update README with instructions for building and running unit tests
+* Remove external cmake project for gtest
+  Now only build tests if a gtest installation already exists on the system. This should expedite time to build for users that do not care about building/running unit tests and also eliminates the need for internet access when building.
+* Add test depend to gtest in package.xml
+* Contributors: Jacob Perron
 
 1.6.0 (2018-04-07)
 ------------------
