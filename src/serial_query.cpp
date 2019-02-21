@@ -44,7 +44,7 @@ namespace create {
 
   void SerialQuery::flushInput() {
     // Only works with POSIX support
-    tcflush(port.lowest_layer().native(), TCIFLUSH);
+    tcflush(port.lowest_layer().native_handle(), TCIFLUSH);
   }
 
   void SerialQuery::processByte(uint8_t byteRead) {
