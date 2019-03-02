@@ -51,14 +51,13 @@ Note, the examples found in the "examples" directory are built with the library.
         cmake ..
         make -j
 
-#### catkin ####
+#### colcon ####
 
         mkdir -p create_ws/src
-        cd create_ws
-        catkin init
-        cd src
+        cd create_ws/src
         git clone https://github.com/AutonomyLab/libcreate.git
-        catkin build
+        cd ..
+        colcon build
 
 ## Running Tests ##
 
