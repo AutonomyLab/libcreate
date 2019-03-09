@@ -186,10 +186,14 @@ namespace create {
     totalLeftDist += leftWheelDist;
     totalRightDist += rightWheelDist;
 
-    if (dt > 0.1) {
+    if (fabs(dt) > util::EPS) {
       vel.x = deltaDist / dt;
       vel.y = 0.0;
       vel.yaw = deltaYaw / dt;
+    } else {
+      vel.x = 0.0;
+      vel.y = 0.0;
+      vel.yaw = 0.0;
     }
 
     // Update covariances
