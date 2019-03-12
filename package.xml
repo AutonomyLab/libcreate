@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package format="2">
+<package format="3">
   <name>libcreate</name>
   <version>1.6.1</version>
   <description>C++ library for interfacing with iRobot's Create 1 and Create 2</description>
@@ -18,7 +18,7 @@
 
   <depend>boost</depend>
 
-  <exec_depend>catkin</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 1">catkin</exec_depend>
 
   <doc_depend>doxygen</doc_depend>
 
