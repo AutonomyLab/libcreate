@@ -5,7 +5,7 @@
 
 namespace create {
 
-  SerialStream::SerialStream(boost::shared_ptr<Data> d, const uint8_t& header) : Serial(d), headerByte(header){
+  SerialStream::SerialStream(boost::shared_ptr<Data> d, const uint8_t& header) : Serial(d), readState(READ_HEADER), headerByte(header) {
   }
 
   bool SerialStream::startSensorStream() {
