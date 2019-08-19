@@ -40,13 +40,14 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <boost/thread/condition_variable.hpp>
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
 
 #include "create/data.h"
 #include "create/types.h"
 #include "create/util.h"
 
 namespace create {
-  class Serial {
+  class Serial : public boost::enable_shared_from_this<Serial> {
 
     protected:
       boost::asio::io_service io;
