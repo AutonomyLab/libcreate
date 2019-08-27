@@ -8,6 +8,7 @@ namespace create {
   Serial::Serial(boost::shared_ptr<Data> d) :
     data(d),
     port(io),
+    signals(io, SIGINT, SIGTERM),
     isReading(false),
     dataReady(false),
     corruptPackets(0),
@@ -18,6 +19,18 @@ namespace create {
     disconnect();
   }
 
+  void Serial::signalHandler(const boost::system::error_code& error, int signal_number) {
+    if (!error) {
+      if (connected()) {
+        // Ensure not in Safe/Full modes
+        sendOpcode(OC_START);
+        // Stop OI
+        sendOpcode(OC_STOP);
+        exit(signal_number);
+      }
+    }
+  }
+
   bool Serial::connect(const std::string& portName, const int& baud, boost::function<void()> cb) {
     using namespace boost::asio;
     port.open(portName);
@@ -26,6 +39,8 @@ namespace create {
     port.set_option(serial_port::parity(serial_port::parity::none));
     port.set_option(serial_port::stop_bits(serial_port::stop_bits::one));
     port.set_option(serial_port::flow_control(serial_port::flow_control::none));
+
+    signals.async_wait(boost::bind(&Serial::signalHandler, this, _1, _2));
 
     usleep(1000000);
 
