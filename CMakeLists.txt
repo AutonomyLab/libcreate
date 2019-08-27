@@ -56,6 +56,7 @@ target_link_libraries(${LIBRARY_NAME}
 set(EXAMPLES
   battery_level
   bumpers
+  cliffs
   drive_circle
   leds
   packets
