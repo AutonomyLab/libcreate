@@ -4,9 +4,9 @@ C++ library for interfacing with iRobot's [Create 1 and 2](http://www.irobot.com
 
 * [Code API](http://docs.ros.org/kinetic/api/libcreate/html/index.html)
 * Protocol documentation:
-  - [`V_1`](http://www.ecsl.cs.sunysb.edu/mint/Roomba_SCI_Spec_Manual.pdf) (Roomba 400 series )
-  - [`V_2`](http://www.irobot.com/filelibrary/pdfs/hrd/create/Create%20Open%20Interface_v2.pdf) (Create 1, Roomba 500 series)
-  - [`V_3`](https://cdn-shop.adafruit.com/datasheets/create_2_Open_Interface_Spec.pdf) (Create 2, Roomba 600-800 series)
+  - [`V_1`](https://drive.google.com/open?id=0B9O4b91VYXMdUHlqNklDU09NU0k) (Roomba 400 series )
+  - [`V_2`](https://drive.google.com/open?id=0B9O4b91VYXMdMmFPMVNDUEZ6d0U) (Create 1, Roomba 500 series)
+  - [`V_3`](https://drive.google.com/open?id=0B9O4b91VYXMdSVk4amw1N09mQ3c) (Create 2, Roomba 600-800 series)
 * Author: [Jacob Perron](http://jacobperron.ca) ([Autonomy Lab](http://autonomylab.org), [Simon Fraser University](http://www.sfu.ca))
 * Contributors: [Mani Monajjemi](http:mani.im), [Ben Wolsieffer](https://github.com/lopsided98)
 
@@ -52,6 +52,8 @@ Note, the examples found in the "examples" directory are built with the library.
         make -j
 
 #### catkin ####
+
+Requires [catkin_tools](https://catkin-tools.readthedocs.io/en/latest/).
 
         mkdir -p create_ws/src
         cd create_ws
