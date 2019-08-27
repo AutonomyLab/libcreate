@@ -64,13 +64,18 @@ int main(int argc, char** argv) {
 
   while (!robot->isCleanButtonPressed()) {
     // Get wheeldrop status
-    const bool wheeldrop = robot->isWheeldrop();
+    const bool wheeldrop_left = robot->isLeftWheeldrop();
+    const bool wheeldrop_right = robot->isRightWheeldrop();
 
     // Print status
-    std::cout << "\rWheeldrop status: " << wheeldrop;
+    std::cout << "\rWheeldrop status (left and right): [ " <<
+      wheeldrop_left <<
+      ", " <<
+      wheeldrop_right <<
+      " ]";
 
     // If dropped, then make light red
-    if (wheeldrop)
+    if (wheeldrop_left || wheeldrop_right)
       robot->setPowerLED(255);  // Red
     else
       robot->setPowerLED(0);  // Green
