@@ -15,8 +15,6 @@ namespace create {
 
   namespace ublas = boost::numeric::ublas;
 
-  // TODO: Handle SIGINT to do clean disconnect
-
   void Create::init() {
     mainMotorPower = 0;
     sideMotorPower = 0;
