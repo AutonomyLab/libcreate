@@ -597,6 +597,26 @@ namespace create {
     }
   }
 
+  bool Create::isLeftWheeldrop() const {
+    if (data->isValidPacketID(ID_BUMP_WHEELDROP)) {
+      return (GET_DATA(ID_BUMP_WHEELDROP) & 0x08) != 0;
+    }
+    else {
+      CERR("[create::Create] ", "Wheeldrop sensor not supported!");
+      return false;
+    }
+  }
+
+  bool Create::isRightWheeldrop() const {
+    if (data->isValidPacketID(ID_BUMP_WHEELDROP)) {
+      return (GET_DATA(ID_BUMP_WHEELDROP) & 0x04) != 0;
+    }
+    else {
+      CERR("[create::Create] ", "Wheeldrop sensor not supported!");
+      return false;
+    }
+  }
+
   bool Create::isLeftBumper() const {
     if (data->isValidPacketID(ID_BUMP_WHEELDROP)) {
       return (GET_DATA(ID_BUMP_WHEELDROP) & 0x02) != 0;

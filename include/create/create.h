@@ -337,6 +337,16 @@ namespace create {
       bool isWheeldrop() const;
 
       /**
+       * \return true if a left wheeldrop is detected, false otherwise.
+       */
+      bool isLeftWheeldrop() const;
+
+      /**
+       * \return true if a right wheeldrop is detected, false otherwise.
+       */
+      bool isRightWheeldrop() const;
+
+      /**
        * \return true if left bumper is pressed, false otherwise.
        */
       bool isLeftBumper() const;
