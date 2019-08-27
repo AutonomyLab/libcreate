@@ -4,7 +4,7 @@
   <version>1.6.1</version>
   <description>C++ library for interfacing with iRobot's Create 1 and Create 2</description>
 
-  <maintainer email="jperron@sfu.ca">Jacob Perron</maintainer>
+  <maintainer email="jacobmperron@gmail.com">Jacob Perron</maintainer>
 
   <license>BSD</license>
 
@@ -12,7 +12,7 @@
   <url type="repository">https://github.com/AutonomyLab/libcreate</url>
   <url type="bugtracker">https://github.com/AutonomyLab/libcreate/issues</url>
 
-  <author email="jperron@sfu.ca">Jacob Perron</author>
+  <author email="jacobmperron@gmail.com">Jacob Perron</author>
 
   <buildtool_depend>cmake</buildtool_depend>
 
