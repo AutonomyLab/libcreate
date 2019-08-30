@@ -181,7 +181,7 @@ namespace create {
     OC_SENSORS= 142,
     OC_QUERY_LIST=149,
     OC_STREAM = 148,
-    OC_TOGGLE_STREAM = 150,
+    OC_TOGGLE_STREAM = 150
   };
 
   enum BAUDCODE {
