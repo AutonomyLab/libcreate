@@ -6,11 +6,11 @@
 namespace create {
 
   Serial::Serial(boost::shared_ptr<Data> d) :
-    data(d),
-    port(io),
     signals(io, SIGINT, SIGTERM),
-    isReading(false),
+    port(io),
     dataReady(false),
+    isReading(false),
+    data(d),
     corruptPackets(0),
     totalPackets(0) {
   }

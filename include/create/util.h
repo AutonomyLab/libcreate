@@ -55,13 +55,13 @@ namespace create {
       while (a < -PI) a += TWO_PI;
       while (a > PI) a -= TWO_PI;
       return a;
-    };
+    }
 
     typedef unsigned long long timestamp_t;
 
     /** Get a timestamp for the current time in micro-seconds.
      */
-    static timestamp_t getTimestamp() {
+    inline timestamp_t getTimestamp() {
       struct timeval now;
       gettimeofday(&now, NULL);
       return now.tv_usec + (timestamp_t) now.tv_sec * 1000000;

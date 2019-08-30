@@ -64,15 +64,15 @@ namespace create {
   }
 
   Create::Matrix Create::addMatrices(const Matrix &A, const Matrix &B) const {
-    int rows = A.size1();
-    int cols = A.size2();
+    size_t rows = A.size1();
+    size_t cols = A.size2();
 
     assert(rows == B.size1());
     assert(cols == B.size2());
 
     Matrix C(rows, cols);
-    for (int i = 0; i < rows; i++) {
-      for (int j = 0; j < cols; j++) {
+    for (size_t i = 0u; i < rows; i++) {
+      for (size_t j = 0u; j < cols; j++) {
         const float a = A(i, j);
         const float b = B(i, j);
         if (util::willFloatOverflow(a, b)) {
@@ -345,8 +345,8 @@ namespace create {
 
   bool Create::setDate(const DayOfWeek& day, const uint8_t& hour, const uint8_t& min) const {
     if (day < 0 || day > 6 ||
-        hour < 0 || hour > 23 ||
-        min < 0 || min > 59)
+        hour > 23 ||
+        min > 59)
       return false;
 
     uint8_t cmd[4] = { OC_DATE, day, hour, min };
@@ -362,7 +362,7 @@ namespace create {
     int16_t radius_mm = roundf(radius * 1000);
 
     // Bound radius if not a special case
-    if (radius_mm != 32768 && radius_mm != 32767 &&
+    if (radius_mm != -32768 && radius_mm != 32767 &&
         radius_mm != -1 && radius_mm != 1) {
       BOUND(radius_mm, -util::MAX_RADIUS * 1000, util::MAX_RADIUS * 1000);
     }
@@ -561,7 +561,7 @@ namespace create {
                           const float* durations) const {
     int i, j;
     uint8_t duration;
-    uint8_t cmd[2 * songLength + 3];
+    std::vector<uint8_t> cmd(2 * songLength + 3);
     cmd[0] = OC_SONG;
     cmd[1] = songNumber;
     cmd[2] = songLength;
@@ -575,11 +575,11 @@ namespace create {
       j++;
     }
 
-    return serial->send(cmd, 2 * songLength + 3);
+    return serial->send(cmd.data(), cmd.size());
   }
 
   bool Create::playSong(const uint8_t& songNumber) const {
-    if (songNumber < 0 || songNumber > 4)
+    if (songNumber > 4)
       return false;
     uint8_t cmd[2] = { OC_PLAY, songNumber };
     return serial->send(cmd, 2);
@@ -754,7 +754,6 @@ namespace create {
   ChargingState Create::getChargingState() const {
     if (data->isValidPacketID(ID_CHARGE_STATE)) {
       uint8_t chargeState = GET_DATA(ID_CHARGE_STATE);
-      assert(chargeState >= 0);
       assert(chargeState <= 5);
       return (ChargingState) chargeState;
     }
