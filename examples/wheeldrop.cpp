@@ -47,10 +47,10 @@ int main(int argc, char** argv) {
   }
 
   // Construct robot object
-  create::Create* robot = new create::Create(model);
+  create::Create robot(model);
 
   // Connect to robot
-  if (robot->connect(port, baud))
+  if (robot.connect(port, baud))
     std::cout << "Connected to robot" << std::endl;
   else {
     std::cout << "Failed to connect to robot on port " << port.c_str() << std::endl;
@@ -58,14 +58,12 @@ int main(int argc, char** argv) {
   }
 
   // Switch to Full mode
-  robot->setMode(create::MODE_FULL);
+  robot.setMode(create::MODE_FULL);
 
-  std::cout << std::endl << "Press center 'Clean' button to disconnect and end program" << std::endl;
-
-  while (!robot->isCleanButtonPressed()) {
+  while (true) {
     // Get wheeldrop status
-    const bool wheeldrop_left = robot->isLeftWheeldrop();
-    const bool wheeldrop_right = robot->isRightWheeldrop();
+    const bool wheeldrop_left = robot.isLeftWheeldrop();
+    const bool wheeldrop_right = robot.isRightWheeldrop();
 
     // Print status
     std::cout << "\rWheeldrop status (left and right): [ " <<
@@ -76,21 +74,12 @@ int main(int argc, char** argv) {
 
     // If dropped, then make light red
     if (wheeldrop_left || wheeldrop_right)
-      robot->setPowerLED(255);  // Red
+      robot.setPowerLED(255);  // Red
     else
-      robot->setPowerLED(0);  // Green
+      robot.setPowerLED(0);  // Green
 
     usleep(10000);  // 10 Hz
   }
 
-  std::cout << std::endl;
-
-  // Call disconnect to avoid leaving robot in Full mode
-  robot->disconnect();
-
-  // Clean up
-  delete robot;
-
-  std::cout << "Bye!" << std::endl;
   return 0;
 }
