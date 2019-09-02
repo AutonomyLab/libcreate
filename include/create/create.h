@@ -34,6 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/shared_ptr.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
+#include <chrono>
 #include <string>
 #include <unistd.h>
 
@@ -79,7 +80,7 @@ namespace create {
       float totalLeftDist;
       float totalRightDist;
       bool firstOnData;
-      util::timestamp_t prevOnDataTime;
+      std::chrono::time_point<std::chrono::system_clock> prevOnDataTime;
 
       Matrix poseCovar;
 

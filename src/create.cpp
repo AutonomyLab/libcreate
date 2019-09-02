@@ -94,13 +94,13 @@ namespace create {
         prevTicksLeft = GET_DATA(ID_LEFT_ENC);
         prevTicksRight = GET_DATA(ID_RIGHT_ENC);
       }
-      prevOnDataTime = util::getTimestamp();
+      prevOnDataTime = std::chrono::system_clock::now();
       firstOnData = false;
     }
 
     // Get current time
-    util::timestamp_t curTime = util::getTimestamp();
-    float dt = (curTime - prevOnDataTime) / 1000000.0;
+    auto curTime = std::chrono::system_clock::now();
+    float dt = static_cast<std::chrono::duration<float>>(curTime - prevOnDataTime).count();
     float deltaDist, deltaX, deltaY, deltaYaw, leftWheelDist, rightWheelDist, wheelDistDiff;
 
     // Protocol versions 1 and 2 use distance and angle fields for odometry
