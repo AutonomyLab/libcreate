@@ -32,8 +32,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef CREATE_UTIL_H
 #define CREATE_UTIL_H
 
-#include <sys/time.h>
-
 #define COUT(prefix,msg) (std::cout<<prefix<<msg<<std::endl)
 #define CERR(prefix,msg) (std::cerr<<prefix<<msg<<std::endl)
 
@@ -55,16 +53,6 @@ namespace create {
       while (a < -PI) a += TWO_PI;
       while (a > PI) a -= TWO_PI;
       return a;
-    }
-
-    typedef unsigned long long timestamp_t;
-
-    /** Get a timestamp for the current time in micro-seconds.
-     */
-    inline timestamp_t getTimestamp() {
-      struct timeval now;
-      gettimeofday(&now, NULL);
-      return now.tv_usec + (timestamp_t) now.tv_sec * 1000000;
     }
 
     inline bool willFloatOverflow(const float a, const float b) {
