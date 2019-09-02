@@ -17,6 +17,11 @@ option(LIBCREATE_BUILD_TESTS "Enable the build of tests." ON)
 find_package(Boost REQUIRED COMPONENTS system thread)
 find_package(Threads REQUIRED)
 
+# Default to C++11
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 11)
+endif()
+
 #########
 # Build #
 #########
