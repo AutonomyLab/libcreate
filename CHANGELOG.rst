@@ -1,6 +1,39 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package libcreate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+2.0.0 (2019-09-02)
+------------------
+* Cleanup examples
+* Use std::chrono instead of custom timestamp function
+* Remove Trusty CI job
+  * Since it is EOL.
+* Default to C++11
+* Add compiler flags '-Wall -Wextra -Wpedantic'
+  * Fix warnings as a result.
+* Disconnect from serial cleanly on SIGINT
+  * Send the STOP opcode before exiting the program to ensure the robot is not left in a state that could potentially drain the battery.
+* Initialize variable for compiler compatibility
+* Add other serial communication options
+  Otherwise, it's possible that Operation "7" (0x07) is confused for "135" (0x87)
+* Add cliff sensor example
+* Add API for getting left and right cliff detections
+* Update wheeldrop example
+* Add API for getting left and right wheeldrop
+* Use shared pointer when binding callback for serial read (`#38 <https://github.com/autonomylab/libcreate/issues/38>`_)
+  * Resolves an issue with ROS Melodic on 18.04.
+* Fix for compatibility with Boost 1.66
+  * Compatibility with at least as early as Boost 1.58 still persists
+* Update wheel diameter for Create 2
+  * Now matches the spec from iRobot.
+* Add Bionic CI job
+* Add static cast to fix compiler warnings
+* Use package.xml format 3
+  * Make catkin dependency conditional on ROS 1.
+* Add Xenial build to CI
+* Remove std::cout statement
+* Contributors: Anton Gerasimov, Jacob Perron, Ryota Suzuki, Yutaka Kondo
+
 1.6.1 (2018-04-21)
 ------------------
 * Build and install gtest as part of CI

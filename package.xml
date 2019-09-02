@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>libcreate</name>
-  <version>1.6.1</version>
+  <version>2.0.0</version>
   <description>C++ library for interfacing with iRobot's Create 1 and Create 2</description>
 
   <maintainer email="jacobmperron@gmail.com">Jacob Perron</maintainer>
