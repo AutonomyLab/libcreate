@@ -47,25 +47,20 @@ int main(int argc, char** argv) {
   }
 
   // Construct robot object
-  create::Create* robot = new create::Create(model);
+  create::Create robot(model);
 
   // Connect to robot
-  if (robot->connect(port, baud))
+  if (robot.connect(port, baud))
     std::cout << "Connected to robot" << std::endl;
   else {
     std::cout << "Failed to connect to robot on port " << port.c_str() << std::endl;
     return 1;
   }
 
-  // Switch to Full mode
-  // robot->setMode(create::MODE_FULL);
-
-  std::cout << std::endl << "Press center 'Clean' button to disconnect and end program" << std::endl;
-
-  while (!robot->isCleanButtonPressed()) {
+  while (true) {
     // Get serial packet statistics
-    const uint64_t total_packets = robot->getTotalPackets();
-    const uint64_t num_corrupt_packets = robot->getNumCorruptPackets();
+    const uint64_t total_packets = robot.getTotalPackets();
+    const uint64_t num_corrupt_packets = robot.getNumCorruptPackets();
 
     // Print packet stats 
     std::cout << "\rTotal packets: " << total_packets << "  Corrupt packets: " << num_corrupt_packets;
@@ -73,14 +68,5 @@ int main(int argc, char** argv) {
     usleep(100000);  // 10 Hz
   }
 
-  std::cout << std::endl;
-
-  // Call disconnect to avoid leaving robot in Full mode
-  robot->disconnect();
-
-  // Clean up
-  delete robot;
-
-  std::cout << "Bye!" << std::endl;
   return 0;
 }

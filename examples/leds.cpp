@@ -47,10 +47,10 @@ int main(int argc, char** argv) {
   }
 
   // Construct robot object
-  create::Create* robot = new create::Create(model);
+  create::Create robot(model);
 
   // Connect to robot
-  if (robot->connect(port, baud))
+  if (robot.connect(port, baud))
     std::cout << "Connected to robot" << std::endl;
   else {
     std::cout << "Failed to connect to robot on port " << port.c_str() << std::endl;
@@ -58,29 +58,27 @@ int main(int argc, char** argv) {
   }
 
   // Switch to Full mode
-  robot->setMode(create::MODE_FULL);
-
-  std::cout << std::endl << "Press center 'Clean' button to disconnect and end program" << std::endl;
+  robot.setMode(create::MODE_FULL);
 
   bool enable_check_robot_led = true;
   bool enable_debris_led = false;
   bool enable_dock_led = true;
   bool enable_spot_led = false;
-  uint8_t power_led = 0; 
+  uint8_t power_led = 0;
   char digit_buffer[5];
 
-  while (!robot->isCleanButtonPressed()) {
+  while (true) {
     // Set LEDs
-    robot->enableCheckRobotLED(enable_check_robot_led);
-    robot->enableDebrisLED(enable_debris_led);
-    robot->enableDockLED(enable_dock_led);
-    robot->enableSpotLED(enable_spot_led);
-    robot->setPowerLED(power_led);
+    robot.enableCheckRobotLED(enable_check_robot_led);
+    robot.enableDebrisLED(enable_debris_led);
+    robot.enableDockLED(enable_dock_led);
+    robot.enableSpotLED(enable_spot_led);
+    robot.setPowerLED(power_led);
 
     // Set 7-segment displays
     const int len = sprintf(digit_buffer, "%d", power_led);
     for (int i = len; i < 4; i++) digit_buffer[i] = ' ';
-    robot->setDigitsASCII(digit_buffer[0], digit_buffer[1], digit_buffer[2], digit_buffer[3]);
+    robot.setDigitsASCII(digit_buffer[0], digit_buffer[1], digit_buffer[2], digit_buffer[3]);
 
     // Update LED values
     enable_check_robot_led = !enable_check_robot_led;
@@ -92,14 +90,5 @@ int main(int argc, char** argv) {
     usleep(250000);  // 5 Hz
   }
 
-  std::cout << std::endl;
-
-  // Call disconnect to avoid leaving robot in Full mode
-  robot->disconnect();
-
-  // Clean up
-  delete robot;
-
-  std::cout << "Bye!" << std::endl;
   return 0;
 }

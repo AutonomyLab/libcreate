@@ -47,10 +47,10 @@ int main(int argc, char** argv) {
   }
 
   // Construct robot object
-  create::Create* robot = new create::Create(model);
+  create::Create robot(model);
 
   // Connect to robot
-  if (robot->connect(port, baud))
+  if (robot.connect(port, baud))
     std::cout << "Connected to robot" << std::endl;
   else {
     std::cout << "Failed to connect to robot on port " << port.c_str() << std::endl;
@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
   }
 
   // Switch to Full mode
-  robot->setMode(create::MODE_FULL);
+  robot.setMode(create::MODE_FULL);
 
   // Useful note defintions
   const uint8_t G = 55;
@@ -66,14 +66,14 @@ int main(int argc, char** argv) {
   const uint8_t DS = 51;
   const float half = 1.0f;
   const float quarter = 0.5f;
-  const float dotted_eigth = 0.375f; 
+  const float dotted_eigth = 0.375f;
   const float sixteenth = 0.125f;
 
   // Define a song
   const uint8_t song_len = 9;
   const uint8_t notes[song_len] = { G, G, G, DS, AS, G, DS, AS, G };
   const float durations[song_len] = { quarter, quarter, quarter, dotted_eigth, sixteenth, quarter, dotted_eigth, sixteenth, half };
-  robot->defineSong(0, song_len, notes, durations);
+  robot.defineSong(0, song_len, notes, durations);
 
   // Sleep to provide time for song to register
   usleep(1000000);
@@ -81,17 +81,13 @@ int main(int argc, char** argv) {
   std::cout << "Playing a song!" << std::endl;
 
   // Request to play the song we just defined
-  robot->playSong(0); 
+  robot.playSong(0);
 
   // Expect the song to take about four seconds
   usleep(4500000);
 
   // Call disconnect to avoid leaving robot in Full mode
-  robot->disconnect();
+  robot.disconnect();
 
-  // Clean up
-  delete robot;
-
-  std::cout << "Bye!" << std::endl;
   return 0;
 }

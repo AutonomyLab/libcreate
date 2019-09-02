@@ -47,10 +47,10 @@ int main(int argc, char** argv) {
   }
 
   // Construct robot object
-  create::Create* robot = new create::Create(model);
+  create::Create robot(model);
 
   // Connect to robot
-  if (robot->connect(port, baud))
+  if (robot.connect(port, baud))
     std::cout << "Connected to robot" << std::endl;
   else {
     std::cout << "Failed to connect to robot on port " << port.c_str() << std::endl;
@@ -58,37 +58,35 @@ int main(int argc, char** argv) {
   }
 
   // Switch to Full mode
-  robot->setMode(create::MODE_FULL);
-
-  std::cout << std::endl << "Press center 'Clean' button to disconnect and end program" << std::endl;
+  robot.setMode(create::MODE_FULL);
 
   uint16_t light_signals[6];
   bool light_bumpers[6];
   bool contact_bumpers[2];
 
-  while (!robot->isCleanButtonPressed()) {
+  while (true) {
     // Get light sensor data (only available for Create 2 or later robots)
     if (model == create::RobotModel::CREATE_2) {
       // Get raw light signal values
-      light_signals[0] = robot->getLightSignalLeft();
-      light_signals[1] = robot->getLightSignalFrontLeft();
-      light_signals[2] = robot->getLightSignalCenterLeft();
-      light_signals[3] = robot->getLightSignalCenterRight();
-      light_signals[4] = robot->getLightSignalFrontRight();
-      light_signals[5] = robot->getLightSignalRight();
+      light_signals[0] = robot.getLightSignalLeft();
+      light_signals[1] = robot.getLightSignalFrontLeft();
+      light_signals[2] = robot.getLightSignalCenterLeft();
+      light_signals[3] = robot.getLightSignalCenterRight();
+      light_signals[4] = robot.getLightSignalFrontRight();
+      light_signals[5] = robot.getLightSignalRight();
 
       // Get obstacle data from light sensors (true/false)
-      light_bumpers[0] = robot->isLightBumperLeft();
-      light_bumpers[1] = robot->isLightBumperFrontLeft();
-      light_bumpers[2] = robot->isLightBumperCenterLeft();
-      light_bumpers[3] = robot->isLightBumperCenterRight();
-      light_bumpers[4] = robot->isLightBumperFrontRight();
-      light_bumpers[5] = robot->isLightBumperRight();
+      light_bumpers[0] = robot.isLightBumperLeft();
+      light_bumpers[1] = robot.isLightBumperFrontLeft();
+      light_bumpers[2] = robot.isLightBumperCenterLeft();
+      light_bumpers[3] = robot.isLightBumperCenterRight();
+      light_bumpers[4] = robot.isLightBumperFrontRight();
+      light_bumpers[5] = robot.isLightBumperRight();
     }
 
     // Get state of bumpers
-    contact_bumpers[0] = robot->isLeftBumper();
-    contact_bumpers[1] = robot->isRightBumper();
+    contact_bumpers[0] = robot.isLeftBumper();
+    contact_bumpers[1] = robot.isRightBumper();
 
     // Print signals from left to right
     std::cout << "[ " << light_signals[0] << " , "
@@ -113,14 +111,5 @@ int main(int argc, char** argv) {
     usleep(100000);  // 10 Hz
   }
 
-  std::cout << std::endl;
-
-  // Call disconnect to avoid leaving robot in Full mode
-  robot->disconnect();
-
-  // Clean up
-  delete robot;
-
-  std::cout << "Bye!" << std::endl;
   return 0;
 }
