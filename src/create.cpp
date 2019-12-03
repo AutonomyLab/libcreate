@@ -465,7 +465,7 @@ namespace create {
 
     if (model.getVersion() == V_1) {
         uint8_t cmd[2] = { OC_MOTORS,
-                           (uint8_t)((side != 0.0 ? 1 : 0) |
+                           static_cast<uint8_t>((side != 0.0 ? 1 : 0) |
                                      (vacuum != 0.0 ? 2 : 0) |
                                      (main != 0.0 ? 4 : 0))
                          };
