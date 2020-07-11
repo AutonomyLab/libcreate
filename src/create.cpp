@@ -1036,6 +1036,36 @@ namespace create {
     }
   }
 
+  bool Create::isSideBrushOvercurrent() const { 
+    if (data->isValidPacketID(ID_OVERCURRENTS)) {
+      return (GET_DATA(ID_OVERCURRENTS) & 0x01) != 0;
+    }
+    else {
+      CERR("[create::Create] ", "Overcurrent sensor not supported!");
+      return false;
+    }
+  }
+
+  bool Create::isMainBrushOvercurrent() const { 
+    if (data->isValidPacketID(ID_OVERCURRENTS)) {
+      return (GET_DATA(ID_OVERCURRENTS) & 0x04) != 0;
+    }
+    else {
+      CERR("[create::Create] ", "Overcurrent sensor not supported!");
+      return false;
+    }
+  }
+  
+  bool Create::isWheelOvercurrent() const { 
+    if (data->isValidPacketID(ID_OVERCURRENTS)) {
+      return (GET_DATA(ID_OVERCURRENTS) & 0x18) != 0;
+    }
+    else {
+      CERR("[create::Create] ", "Overcurrent sensor not supported!");
+      return false;
+    }
+  }
+
   float Create::getLeftWheelDistance() const {
     return totalLeftDist;
   }
