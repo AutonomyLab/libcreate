@@ -32,9 +32,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef CREATE_DATA_H
 #define CREATE_DATA_H
 
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 #include <map>
+#include <memory>
 #include <vector>
 
 #include "create/packet.h"
@@ -43,7 +42,7 @@ POSSIBILITY OF SUCH DAMAGE.
 namespace create {
   class Data {
     private:
-      std::map<uint8_t, boost::shared_ptr<Packet> > packets;
+      std::map<uint8_t, std::shared_ptr<Packet> > packets;
       uint32_t totalDataBytes;
       std::vector<uint8_t> ids;
 
@@ -52,7 +51,7 @@ namespace create {
       ~Data();
 
       bool isValidPacketID(const uint8_t id) const;
-      boost::shared_ptr<Packet> getPacket(const uint8_t id);
+      std::shared_ptr<Packet> getPacket(const uint8_t id);
       void validateAll();
       uint32_t getTotalDataBytes() const;
       uint8_t getNumPackets() const;

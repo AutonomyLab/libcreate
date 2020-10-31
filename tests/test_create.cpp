@@ -33,8 +33,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "gtest/gtest.h"
 
-#include <boost/shared_ptr.hpp>
-
 TEST(CreateTest, ConstructorSingleParam)
 {
   create::Create create_default;

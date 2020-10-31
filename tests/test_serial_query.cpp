@@ -33,17 +33,17 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "gtest/gtest.h"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 TEST(SerialQueryTest, Constructor)
 {
-  boost::shared_ptr<create::Data> data_ptr = boost::make_shared<create::Data>();
+  std::shared_ptr<create::Data> data_ptr = std::make_shared<create::Data>();
   create::SerialQuery serial_query(data_ptr);
 }
 
 TEST(SerialQueryTest, Connected)
 {
-  boost::shared_ptr<create::Data> data_ptr = boost::make_shared<create::Data>();
+  std::shared_ptr<create::Data> data_ptr = std::make_shared<create::Data>();
   create::SerialQuery serial_query(data_ptr);
 
   // Did not call connect and nothing to connect to, so expect false
@@ -52,7 +52,7 @@ TEST(SerialQueryTest, Connected)
 
 TEST(SerialQueryTest, Disconnect)
 {
-  boost::shared_ptr<create::Data> data_ptr = boost::make_shared<create::Data>();
+  std::shared_ptr<create::Data> data_ptr = std::make_shared<create::Data>();
   create::SerialQuery serial_query(data_ptr);
 
   // Not connected, but should not fail
@@ -61,7 +61,7 @@ TEST(SerialQueryTest, Disconnect)
 
 TEST(SerialQueryTest, NumPackets)
 {
-  boost::shared_ptr<create::Data> data_ptr = boost::make_shared<create::Data>();
+  std::shared_ptr<create::Data> data_ptr = std::make_shared<create::Data>();
   create::SerialQuery serial_query(data_ptr);
 
   // Not connected, so zero packets should have been received
@@ -71,7 +71,7 @@ TEST(SerialQueryTest, NumPackets)
 
 TEST(SerialQueryTest, Send)
 {
-  boost::shared_ptr<create::Data> data_ptr = boost::make_shared<create::Data>();
+  std::shared_ptr<create::Data> data_ptr = std::make_shared<create::Data>();
   create::SerialQuery serial_query(data_ptr);
 
   // Some bytes to send (to set date)
@@ -82,7 +82,7 @@ TEST(SerialQueryTest, Send)
 
 TEST(SerialQueryTest, SendOpcode)
 {
-  boost::shared_ptr<create::Data> data_ptr = boost::make_shared<create::Data>();
+  std::shared_ptr<create::Data> data_ptr = std::make_shared<create::Data>();
   create::SerialQuery serial_query(data_ptr);
 
   // Not connected, so failure expected

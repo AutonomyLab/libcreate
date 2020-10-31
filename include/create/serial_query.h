@@ -36,11 +36,9 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef CREATE_SERIAL_QUERY_H
 #define CREATE_SERIAL_QUERY_H
 
+#include <memory>
+
 #include <boost/asio.hpp>
-#include <boost/thread.hpp>
-#include <boost/thread/condition_variable.hpp>
-#include <boost/function.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include "create/data.h"
 #include "create/types.h"
@@ -69,7 +67,7 @@ namespace create {
       void processByte(uint8_t byteRead);
 
     public:
-      SerialQuery(boost::shared_ptr<Data> data);
+      SerialQuery(std::shared_ptr<Data> data);
   };
 }  // namespace create
 

@@ -1,11 +1,12 @@
 #include <iostream>
+#include <memory>
 
 #include "create/serial_stream.h"
 #include "create/types.h"
 
 namespace create {
 
-  SerialStream::SerialStream(boost::shared_ptr<Data> d, const uint8_t& header) : Serial(d), readState(READ_HEADER), headerByte(header) {
+  SerialStream::SerialStream(std::shared_ptr<Data> d, const uint8_t& header) : Serial(d), readState(READ_HEADER), headerByte(header) {
   }
 
   bool SerialStream::startSensorStream() {

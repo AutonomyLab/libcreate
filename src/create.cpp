@@ -1,8 +1,7 @@
-#include <boost/bind.hpp>
-#include <boost/make_shared.hpp>
 #include <iostream>
 #include <cmath>
 #include <ctime>
+#include <memory>
 #include <assert.h>
 
 #include "create/create.h"
@@ -42,11 +41,11 @@ namespace create {
     poseCovar = Matrix(3, 3, 0.0);
     requestedLeftVel = 0;
     requestedRightVel = 0;
-    data = boost::shared_ptr<Data>(new Data(model.getVersion()));
+    data = std::shared_ptr<Data>(new Data(model.getVersion()));
     if (model.getVersion() == V_1) {
-      serial = boost::make_shared<SerialQuery>(data);
+      serial = std::make_shared<SerialQuery>(data);
     } else {
-      serial = boost::make_shared<SerialStream>(data);
+      serial = std::make_shared<SerialStream>(data);
     }
   }
 
@@ -273,7 +272,7 @@ namespace create {
     float maxWait = 30; // seconds
     float retryInterval = 5; //seconds
     time(&start);
-    while (!serial->connect(port, baud, boost::bind(&Create::onData, this)) && !timeout) {
+    while (!serial->connect(port, baud, std::bind(&Create::onData, this)) && !timeout) {
       time(&now);
       if (difftime(now, start) > maxWait) {
         timeout = true;

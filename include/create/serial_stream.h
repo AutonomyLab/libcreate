@@ -35,11 +35,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef CREATE_SERIAL_STREAM_H
 #define CREATE_SERIAL_STREAM_H
 
-#include <boost/asio.hpp>
-#include <boost/thread.hpp>
-#include <boost/thread/condition_variable.hpp>
-#include <boost/function.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "create/data.h"
 #include "create/types.h"
@@ -73,7 +69,7 @@ namespace create {
       void processByte(uint8_t byteRead);
 
     public:
-      SerialStream(boost::shared_ptr<Data> data, const uint8_t& header = create::util::STREAM_HEADER);
+      SerialStream(std::shared_ptr<Data> data, const uint8_t& header = create::util::STREAM_HEADER);
 
   };
 }  // namespace create
