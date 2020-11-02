@@ -31,15 +31,15 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef CREATE_PACKET_H
 #define CREATE_PACKET_H
 
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 namespace create {
   class Packet {
     private:
       uint16_t data;
       uint16_t tmpData;
-      mutable boost::mutex dataMutex;
-      mutable boost::mutex tmpDataMutex;
+      mutable std::mutex dataMutex;
+      mutable std::mutex tmpDataMutex;
 
     protected:
       // Thread safe

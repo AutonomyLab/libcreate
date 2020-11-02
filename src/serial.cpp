@@ -1,3 +1,5 @@
+#include <chrono>
+#include <functional>
 #include <iostream>
 
 #include "create/serial.h"
@@ -5,7 +7,7 @@
 
 namespace create {
 
-  Serial::Serial(boost::shared_ptr<Data> d) :
+  Serial::Serial(std::shared_ptr<Data> d) :
     signals(io, SIGINT, SIGTERM),
     port(io),
     dataReady(false),
@@ -31,7 +33,7 @@ namespace create {
     }
   }
 
-  bool Serial::connect(const std::string& portName, const int& baud, boost::function<void()> cb) {
+  bool Serial::connect(const std::string& portName, const int& baud, std::function<void()> cb) {
     using namespace boost::asio;
     port.open(portName);
     port.set_option(serial_port::baud_rate(baud));
@@ -40,7 +42,7 @@ namespace create {
     port.set_option(serial_port::stop_bits(serial_port::stop_bits::one));
     port.set_option(serial_port::flow_control(serial_port::flow_control::none));
 
-    signals.async_wait(boost::bind(&Serial::signalHandler, this, _1, _2));
+    signals.async_wait(std::bind(&Serial::signalHandler, this, std::placeholders::_1, std::placeholders::_2));
 
     usleep(1000000);
 
@@ -90,17 +92,22 @@ namespace create {
     // Start continuously reading one byte at a time
     boost::asio::async_read(port,
                             boost::asio::buffer(&byteRead, 1),
-                            boost::bind(&Serial::onData, shared_from_this(), _1, _2));
+                            std::bind(&Serial::onData,
+                                      shared_from_this(),
+                                      std::placeholders::_1,
+                                      std::placeholders::_2));
 
-    ioThread = boost::thread(boost::bind(&boost::asio::io_service::run, &io));
+    ioThread = std::thread(std::bind(
+        static_cast<std::size_t(boost::asio::io_service::*)(void)>(
+          &boost::asio::io_service::run), &io));
 
     // Wait for first complete read to finish
-    boost::unique_lock<boost::mutex> lock(dataReadyMut);
+    std::unique_lock<std::mutex> lock(dataReadyMut);
 
     int attempts = 1;
     int maxAttempts = 10;
     while (!dataReady) {
-      if (!dataReadyCond.timed_wait(lock, boost::get_system_time() + boost::posix_time::milliseconds(500))) {
+      if (dataReadyCond.wait_for(lock, std::chrono::milliseconds(500)) == std::cv_status::timeout) {
         if (attempts >= maxAttempts) {
           CERR("[create::Serial] ", "failed to receive data from Create. Check if robot is powered!");
           io.stop();
@@ -125,7 +132,7 @@ namespace create {
       ioThread.join();
       isReading = false;
       {
-        boost::lock_guard<boost::mutex> lock(dataReadyMut);
+        std::lock_guard<std::mutex> lock(dataReadyMut);
         dataReady = false;
       }
     }
@@ -138,7 +145,7 @@ namespace create {
 
     // Notify first data packets ready
     {
-      boost::lock_guard<boost::mutex> lock(dataReadyMut);
+      std::lock_guard<std::mutex> lock(dataReadyMut);
       if (!dataReady) {
         dataReady = true;
         dataReadyCond.notify_one();
@@ -163,7 +170,10 @@ namespace create {
     // Read the next byte
     boost::asio::async_read(port,
                             boost::asio::buffer(&byteRead, 1),
-                            boost::bind(&Serial::onData, shared_from_this(), _1, _2));
+                            std::bind(&Serial::onData,
+                                      shared_from_this(),
+                                      std::placeholders::_1,
+                                      std::placeholders::_2));
   }
 
   bool Serial::send(const uint8_t* bytes, unsigned int numBytes) {

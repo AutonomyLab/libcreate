@@ -1,6 +1,6 @@
 #include "create/data.h"
 
-#define ADD_PACKET(id,nbytes,info,enabledVersion) if ((enabledVersion) & version) packets[id]=boost::make_shared<Packet>(nbytes,info)
+#define ADD_PACKET(id,nbytes,info,enabledVersion) if ((enabledVersion) & version) packets[id]=std::make_shared<Packet>(nbytes,info)
 
 namespace create {
 
@@ -45,7 +45,7 @@ namespace create {
     ADD_PACKET(ID_STASIS, 1, "stasis", V_3);
 
     totalDataBytes = 0;
-    for (std::map<uint8_t, boost::shared_ptr<Packet> >::iterator it = packets.begin();
+    for (std::map<uint8_t, std::shared_ptr<Packet> >::iterator it = packets.begin();
          it != packets.end();
          ++it) {
       ids.push_back(it->first);
@@ -62,15 +62,15 @@ namespace create {
     return false;
   }
 
-  boost::shared_ptr<Packet> Data::getPacket(uint8_t id) {
+  std::shared_ptr<Packet> Data::getPacket(uint8_t id) {
     if (isValidPacketID(id)) {
       return packets[id];
     }
-    return boost::shared_ptr<Packet>();
+    return std::shared_ptr<Packet>();
   }
 
   void Data::validateAll() {
-    for (std::map<uint8_t, boost::shared_ptr<Packet> >::iterator it = packets.begin();
+    for (std::map<uint8_t, std::shared_ptr<Packet> >::iterator it = packets.begin();
          it != packets.end();
          ++it) {
       it->second->validate();

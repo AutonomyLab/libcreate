@@ -32,9 +32,9 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef CREATE_H
 #define CREATE_H
 
-#include <boost/shared_ptr.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <chrono>
+#include <memory>
 #include <string>
 #include <unistd.h>
 
@@ -96,8 +96,8 @@ namespace create {
       bool updateLEDs();
 
     protected:
-      boost::shared_ptr<create::Data> data;
-      boost::shared_ptr<create::Serial> serial;
+      std::shared_ptr<create::Data> data;
+      std::shared_ptr<create::Serial> serial;
 
     public:
       /**

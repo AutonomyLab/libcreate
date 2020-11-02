@@ -34,7 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "gtest/gtest.h"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 TEST(DataTest, Constructor)
 {
@@ -76,31 +76,31 @@ TEST(DataTest, GetPacket)
 {
   // Get a packet exclusive to V_1
   create::Data data_v_1(create::V_1);
-  boost::shared_ptr<create::Packet> v_1_packet_ptr = data_v_1.getPacket(create::ID_OVERCURRENTS);
-  EXPECT_NE(v_1_packet_ptr, boost::shared_ptr<create::Packet>())
+  std::shared_ptr<create::Packet> v_1_packet_ptr = data_v_1.getPacket(create::ID_OVERCURRENTS);
+  EXPECT_NE(v_1_packet_ptr, std::shared_ptr<create::Packet>())
       << "ID_OVERCURRENTS packet not found for protocol V_1";
   EXPECT_EQ(static_cast<int>(v_1_packet_ptr->nbytes), 1);
   EXPECT_EQ(v_1_packet_ptr->info, std::string("overcurrents"));
 
   // Get a packet for V_2
   create::Data data_v_2(create::V_2);
-  boost::shared_ptr<create::Packet> v_2_packet_ptr = data_v_2.getPacket(create::ID_DISTANCE);
-  EXPECT_NE(v_2_packet_ptr, boost::shared_ptr<create::Packet>())
+  std::shared_ptr<create::Packet> v_2_packet_ptr = data_v_2.getPacket(create::ID_DISTANCE);
+  EXPECT_NE(v_2_packet_ptr, std::shared_ptr<create::Packet>())
       << "ID_DISTANCE packet not found for protocol V_2";
   EXPECT_EQ(static_cast<int>(v_2_packet_ptr->nbytes), 2);
   EXPECT_EQ(v_2_packet_ptr->info, std::string("distance"));
 
   // Get a packet exclusive to V_3
   create::Data data_v_3(create::V_3);
-  boost::shared_ptr<create::Packet> v_3_packet_ptr = data_v_3.getPacket(create::ID_LIGHT_FRONT_RIGHT);
-  EXPECT_NE(v_3_packet_ptr, boost::shared_ptr<create::Packet>())
+  std::shared_ptr<create::Packet> v_3_packet_ptr = data_v_3.getPacket(create::ID_LIGHT_FRONT_RIGHT);
+  EXPECT_NE(v_3_packet_ptr, std::shared_ptr<create::Packet>())
       << "ID_LIGHT_FRONT_RIGHT packet not found for protocol V_3";
   EXPECT_EQ(static_cast<int>(v_3_packet_ptr->nbytes), 2);
   EXPECT_EQ(v_3_packet_ptr->info, std::string("light_bumper_front_right"));
 
   // Get a non-existent packet
-  boost::shared_ptr<create::Packet> not_a_packet_ptr = data_v_3.getPacket(60);
-  EXPECT_EQ(not_a_packet_ptr, boost::shared_ptr<create::Packet>());
+  std::shared_ptr<create::Packet> not_a_packet_ptr = data_v_3.getPacket(60);
+  EXPECT_EQ(not_a_packet_ptr, std::shared_ptr<create::Packet>());
 }
 
 TEST(DataTest, GetPacketIDs)

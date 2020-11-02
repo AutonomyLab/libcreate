@@ -32,6 +32,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef CREATE_UTIL_H
 #define CREATE_UTIL_H
 
+#include <cmath>
+
 #define COUT(prefix,msg) (std::cout<<prefix<<msg<<std::endl)
 #define CERR(prefix,msg) (std::cerr<<prefix<<msg<<std::endl)
 
