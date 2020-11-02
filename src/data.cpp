@@ -17,7 +17,7 @@ namespace create {
     ADD_PACKET(ID_CLIFF_FRONT_RIGHT, 1, "cliff_front_right", V_ALL);
     ADD_PACKET(ID_CLIFF_RIGHT, 1, "cliff_right", V_ALL);
     ADD_PACKET(ID_VIRTUAL_WALL, 1, "virtual_wall", V_ALL);
-    ADD_PACKET(ID_OVERCURRENTS, 1, "overcurrents", V_1);
+    ADD_PACKET(ID_OVERCURRENTS, 1, "overcurrents", V_ALL);
     ADD_PACKET(ID_DIRT_DETECT_LEFT, 1, "dirt_detect_left", V_ALL);
     ADD_PACKET(ID_DIRT_DETECT_RIGHT, 1, "dirt_detect_right", V_1);
     ADD_PACKET(ID_IR_OMNI, 1, "ir_opcode", V_ALL);
