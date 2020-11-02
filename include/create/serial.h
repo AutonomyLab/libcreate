@@ -29,9 +29,6 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-// Based on example from:
-//   https://github.com/labust/labust-ros-pkg/wiki/Create-a-Serial-Port-application
-
 #ifndef CREATE_SERIAL_H
 #define CREATE_SERIAL_H
 
@@ -41,7 +38,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <mutex>
 #include <thread>
 
-#include <boost/asio.hpp>
+#include <serial/serial.h>
 
 #include "create/data.h"
 #include "create/types.h"
@@ -51,9 +48,7 @@ namespace create {
   class Serial : public std::enable_shared_from_this<Serial> {
 
     protected:
-      boost::asio::io_service io;
-      boost::asio::signal_set signals;
-      boost::asio::serial_port port;
+      serial::Serial serial;
 
     private:
       std::thread ioThread;
@@ -65,7 +60,7 @@ namespace create {
       uint8_t byteRead;
 
       // Callback executed when data arrives from Create
-      void onData(const boost::system::error_code& e, const std::size_t& size);
+      void onData();
       // Callback to execute once data arrives
       std::function<void()> callback;
       // Start and stop reading data from Create
@@ -81,7 +76,9 @@ namespace create {
       virtual bool startSensorStream() = 0;
       virtual void processByte(uint8_t byteRead) = 0;
 
-      void signalHandler(const boost::system::error_code& error, int signal_number);
+      // TODO
+      // void signalHandler(const boost::system::error_code& error, int signal_number);
+
       // Notifies main thread that data is fresh and makes the user callback
       void notifyDataReady();
 
@@ -90,7 +87,7 @@ namespace create {
       ~Serial();
       bool connect(const std::string& port, const int& baud = 115200, std::function<void()> cb = 0);
       void disconnect();
-      inline bool connected() const { return port.is_open(); };
+      inline bool connected() const { return serial.isOpen(); };
       bool send(const uint8_t* bytes, const uint32_t numBytes);
       bool sendOpcode(const Opcode& code);
       uint64_t getNumCorruptPackets() const;

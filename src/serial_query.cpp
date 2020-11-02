@@ -9,7 +9,7 @@
 namespace create {
 
   SerialQuery::SerialQuery(std::shared_ptr<Data> d) : Serial(d),
-    streamRecoveryTimer(io),
+    // streamRecoveryTimer(io),
     packetID(ID_BUMP_WHEELDROP),
     packetByte(0),
     packetData(0),
@@ -30,23 +30,23 @@ namespace create {
     flushInput();
     send(requestPacket, 2);
     // Automatically resend request if no response is received
-    streamRecoveryTimer.expires_from_now(boost::posix_time::milliseconds(50));
-    streamRecoveryTimer.async_wait(
-      std::bind(&SerialQuery::restartSensorStream, this, std::placeholders::_1));
+    // TODO: implement recovery timer
+    // streamRecoveryTimer.expires_from_now(boost::posix_time::milliseconds(50));
+    // streamRecoveryTimer.async_wait(
+    //   std::bind(&SerialQuery::restartSensorStream, this, std::placeholders::_1));
   }
 
-  void SerialQuery::restartSensorStream(const boost::system::error_code& err) {
-    if (err != boost::asio::error::operation_aborted) {
-      if (packetID != ID_BUMP_WHEELDROP) {
-        ++corruptPackets;
-      }
-      requestSensorData();
-    }
-  }
+  // void SerialQuery::restartSensorStream(const boost::system::error_code& err) {
+  //   if (err != boost::asio::error::operation_aborted) {
+  //     if (packetID != ID_BUMP_WHEELDROP) {
+  //       ++corruptPackets;
+  //     }
+  //     requestSensorData();
+  //   }
+  // }
 
   void SerialQuery::flushInput() {
-    // Only works with POSIX support
-    tcflush(port.lowest_layer().native_handle(), TCIFLUSH);
+    serial.flushInput();
   }
 
   void SerialQuery::processByte(uint8_t byteRead) {

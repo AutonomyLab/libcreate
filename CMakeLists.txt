@@ -15,6 +15,7 @@ set(PACKAGE_VERSION 1.6.1)
 option(LIBCREATE_BUILD_TESTS "Enable the build of tests." ON)
 
 find_package(Boost REQUIRED COMPONENTS system thread)
+find_package(serial REQUIRED)
 find_package(Threads REQUIRED)
 
 # Default to C++11
@@ -31,6 +32,7 @@ set(LIBRARY_NAME create)
 # Specify locations of header files
 include_directories(
   include
+  ${serial_INCLUDE_DIRS}
 )
 
 # Declare cpp library
@@ -56,6 +58,7 @@ endif()
 
 # Link to Boost
 target_link_libraries(${LIBRARY_NAME}
+  ${serial_LIBRARIES}
   ${Boost_LIBRARIES}
 )
 
@@ -75,6 +78,7 @@ foreach(EXAMPLE ${EXAMPLES})
   add_executable(${EXAMPLE} examples/${EXAMPLE}.cpp)
 
   target_link_libraries(${EXAMPLE}
+    ${serial_LIBRARIES}
     ${Boost_LIBRARIES}
     ${LIBRARY_NAME}
   )

@@ -16,7 +16,7 @@
 
   <buildtool_depend>cmake</buildtool_depend>
 
-  <depend>boost</depend>
+  <depend>serial</depend>
 
   <exec_depend condition="$ROS_VERSION == 1">catkin</exec_depend>
 

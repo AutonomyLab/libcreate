@@ -38,8 +38,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <memory>
 
-#include <boost/asio.hpp>
-
 #include "create/data.h"
 #include "create/types.h"
 #include "create/util.h"
@@ -49,7 +47,7 @@ namespace create {
   class SerialQuery : public Serial {
 
     private:
-      boost::asio::deadline_timer streamRecoveryTimer;
+      // boost::asio::deadline_timer streamRecoveryTimer;
       uint8_t packetID;
       int8_t packetByte;
       uint16_t packetData;
@@ -58,7 +56,7 @@ namespace create {
       bool started;
 
       void requestSensorData();
-      void restartSensorStream(const boost::system::error_code& err);
+      // void restartSensorStream(const boost::system::error_code& err);
 
       void flushInput();
 

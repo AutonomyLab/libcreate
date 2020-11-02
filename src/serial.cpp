@@ -1,6 +1,9 @@
 #include <chrono>
 #include <functional>
 #include <iostream>
+#include <thread>
+
+#include <serial/serial.h>
 
 #include "create/serial.h"
 #include "create/types.h"
@@ -8,8 +11,7 @@
 namespace create {
 
   Serial::Serial(std::shared_ptr<Data> d) :
-    signals(io, SIGINT, SIGTERM),
-    port(io),
+    serial(),
     dataReady(false),
     isReading(false),
     data(d),
@@ -21,36 +23,35 @@ namespace create {
     disconnect();
   }
 
-  void Serial::signalHandler(const boost::system::error_code& error, int signal_number) {
-    if (!error) {
-      if (connected()) {
-        // Ensure not in Safe/Full modes
-        sendOpcode(OC_START);
-        // Stop OI
-        sendOpcode(OC_STOP);
-        exit(signal_number);
-      }
-    }
-  }
+  // TODO
+  // void Serial::signalHandler(const boost::system::error_code& error, int signal_number) {
+  //   if (!error) {
+  //     if (connected()) {
+  //       // Ensure not in Safe/Full modes
+  //       sendOpcode(OC_START);
+  //       // Stop OI
+  //       sendOpcode(OC_STOP);
+  //       exit(signal_number);
+  //     }
+  //   }
+  // }
 
   bool Serial::connect(const std::string& portName, const int& baud, std::function<void()> cb) {
-    using namespace boost::asio;
-    port.open(portName);
-    port.set_option(serial_port::baud_rate(baud));
-    port.set_option(serial_port::character_size(8));
-    port.set_option(serial_port::parity(serial_port::parity::none));
-    port.set_option(serial_port::stop_bits(serial_port::stop_bits::one));
-    port.set_option(serial_port::flow_control(serial_port::flow_control::none));
+    // using namespace boost::asio;
+    serial.setPort(portName);
+    serial.setBaudrate(baud);
+    serial.open();
 
-    signals.async_wait(std::bind(&Serial::signalHandler, this, std::placeholders::_1, std::placeholders::_2));
+    // TODO
+    // signals.async_wait(std::bind(&Serial::signalHandler, this, std::placeholders::_1, std::placeholders::_2));
 
-    usleep(1000000);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
-    if (port.is_open()) {
+    if (serial.isOpen()) {
       callback = cb;
       bool startReadSuccess = startReading();
       if (!startReadSuccess) {
-        port.close();
+        serial.close();
       }
       return startReadSuccess;
     }
@@ -67,7 +68,7 @@ namespace create {
       sendOpcode(OC_START);
       // Stop OI
       sendOpcode(OC_STOP);
-      port.close();
+      serial.close();
     }
   }
 
@@ -87,21 +88,11 @@ namespace create {
 
     if (!startSensorStream()) return false;
 
-    io.reset();
-
     // Start continuously reading one byte at a time
-    boost::asio::async_read(port,
-                            boost::asio::buffer(&byteRead, 1),
-                            std::bind(&Serial::onData,
-                                      shared_from_this(),
-                                      std::placeholders::_1,
-                                      std::placeholders::_2));
-
-    ioThread = std::thread(std::bind(
-        static_cast<std::size_t(boost::asio::io_service::*)(void)>(
-          &boost::asio::io_service::run), &io));
+    ioThread = std::thread(std::bind(&Serial::onData, this));
 
     // Wait for first complete read to finish
+    // TODO: remove this mutex and use atomic variable?
     std::unique_lock<std::mutex> lock(dataReadyMut);
 
     int attempts = 1;
@@ -110,7 +101,7 @@ namespace create {
       if (dataReadyCond.wait_for(lock, std::chrono::milliseconds(500)) == std::cv_status::timeout) {
         if (attempts >= maxAttempts) {
           CERR("[create::Serial] ", "failed to receive data from Create. Check if robot is powered!");
-          io.stop();
+          serial.close();
           ioThread.join();
           return false;
         }
@@ -128,7 +119,7 @@ namespace create {
 
   void Serial::stopReading() {
     if (isReading) {
-      io.stop();
+      serial.close();
       ioThread.join();
       isReading = false;
       {
@@ -156,24 +147,22 @@ namespace create {
       callback();
   }
 
-  void Serial::onData(const boost::system::error_code& e, const std::size_t& size) {
-    if (e) {
-      CERR("[create::Serial] ", "serial error - " << e.message());
-      return;
+  void Serial::onData() {
+    // TODO check for program interrupt
+    while (true) {
+      size_t size = 0u;
+      try {
+        size = serial.read(&byteRead, 1);
+      } catch (const std::runtime_error & e) {
+        CERR("[create::Serial] ", "serial error - " << e.what());
+        continue;
+      }
+
+      // Should have read exactly one byte
+      if (size == 1) {
+        processByte(byteRead);
+      }
     }
-
-    // Should have read exactly one byte
-    if (size == 1) {
-      processByte(byteRead);
-    } // end if (size == 1)
-
-    // Read the next byte
-    boost::asio::async_read(port,
-                            boost::asio::buffer(&byteRead, 1),
-                            std::bind(&Serial::onData,
-                                      shared_from_this(),
-                                      std::placeholders::_1,
-                                      std::placeholders::_2));
   }
 
   bool Serial::send(const uint8_t* bytes, unsigned int numBytes) {
@@ -181,8 +170,7 @@ namespace create {
       CERR("[create::Serial] ", "send failed, not connected.");
       return false;
     }
-    // TODO: catch boost exceptions
-    boost::asio::write(port, boost::asio::buffer(bytes, numBytes));
+    serial.write(bytes, static_cast<size_t>(numBytes));
     return true;
   }
 
