@@ -10,7 +10,7 @@ project(libcreate)
 
 add_compile_options(-Wall -Wextra -Wpedantic)
 
-set(PACKAGE_VERSION 1.6.1)
+set(PACKAGE_VERSION 2.0.0)
 
 option(LIBCREATE_BUILD_TESTS "Enable the build of tests." ON)
 
