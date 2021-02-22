@@ -37,6 +37,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <string>
 #include <unistd.h>
+#include <deque>
 
 #include "create/serial_stream.h"
 #include "create/serial_query.h"
@@ -81,6 +82,8 @@ namespace create {
       float totalRightDist;
       bool firstOnData;
       std::chrono::time_point<std::chrono::steady_clock> prevOnDataTime;
+      std::deque<float> dtHistory;
+      uint8_t dtHistoryLength;
 
       Matrix poseCovar;
 
@@ -331,6 +334,14 @@ namespace create {
        * \return true if successful, false otherwise
        */
       bool playSong(const uint8_t& songNumber) const;
+
+      /**
+       * \brief Set dtHistoryLength parameter.
+       * Used to configure the size of the buffer for calculating average time delta (dt).
+       * between onData calls, which in turn is used for velocity calculation.
+       * \param dtHistoryLength number of historical samples to use for calculating average dt.
+       */
+      void setDtHistoryLength(const uint8_t& dtHistoryLength);
 
       /**
        * \return true if a left or right wheeldrop is detected, false otherwise.
