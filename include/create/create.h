@@ -80,7 +80,7 @@ namespace create {
       float totalLeftDist;
       float totalRightDist;
       bool firstOnData;
-      std::chrono::time_point<std::chrono::system_clock> prevOnDataTime;
+      std::chrono::time_point<std::chrono::steady_clock> prevOnDataTime;
 
       Matrix poseCovar;
 

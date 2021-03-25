@@ -93,12 +93,12 @@ namespace create {
         prevTicksLeft = GET_DATA(ID_LEFT_ENC);
         prevTicksRight = GET_DATA(ID_RIGHT_ENC);
       }
-      prevOnDataTime = std::chrono::system_clock::now();
+      prevOnDataTime = std::chrono::steady_clock::now();
       firstOnData = false;
     }
 
     // Get current time
-    auto curTime = std::chrono::system_clock::now();
+    auto curTime = std::chrono::steady_clock::now();
     float dt = static_cast<std::chrono::duration<float>>(curTime - prevOnDataTime).count();
     float deltaDist, deltaX, deltaY, deltaYaw, leftWheelDist, rightWheelDist, wheelDistDiff;
 
