@@ -41,6 +41,7 @@ namespace create {
     poseCovar = Matrix(3, 3, 0.0);
     requestedLeftVel = 0;
     requestedRightVel = 0;
+    dtHistoryLength = 100;
     data = std::shared_ptr<Data>(new Data(model.getVersion()));
     if (model.getVersion() == V_1) {
       serial = std::make_shared<SerialQuery>(data);
@@ -167,8 +168,22 @@ namespace create {
       deltaYaw = wheelDistDiff / model.getAxleLength();
     }
 
-    measuredLeftVel = leftWheelDist / dt;
-    measuredRightVel = rightWheelDist / dt;
+    // determine average dt over window
+    dtHistory.push_front(dt);
+
+    if (dtHistory.size() > dtHistoryLength){
+      dtHistory.pop_back();
+    }
+
+    float dtHistorySum = 0;
+    for (auto it = dtHistory.cbegin(); it != dtHistory.cend(); ++it)
+    {
+      dtHistorySum += *it;
+    }
+    auto dtAverage = dtHistorySum / dtHistory.size();
+
+    measuredLeftVel = leftWheelDist / dtAverage;
+    measuredRightVel = rightWheelDist / dtAverage;
 
     // Moving straight
     if (fabs(wheelDistDiff) < util::EPS) {
@@ -183,10 +198,10 @@ namespace create {
     totalLeftDist += leftWheelDist;
     totalRightDist += rightWheelDist;
 
-    if (fabs(dt) > util::EPS) {
-      vel.x = deltaDist / dt;
+    if (fabs(dtAverage) > util::EPS) {
+      vel.x = deltaDist / dtAverage;
       vel.y = 0.0;
-      vel.yaw = deltaYaw / dt;
+      vel.yaw = deltaYaw / dtAverage;
     } else {
       vel.x = 0.0;
       vel.y = 0.0;
@@ -591,6 +606,10 @@ namespace create {
       return false;
     uint8_t cmd[2] = { OC_PLAY, songNumber };
     return serial->send(cmd, 2);
+  }
+
+  void Create::setDtHistoryLength(const uint8_t& dtHistoryLength) {
+    this->dtHistoryLength = dtHistoryLength;
   }
 
   bool Create::isWheeldrop() const {
