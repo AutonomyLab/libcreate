@@ -496,15 +496,15 @@ namespace create {
   }
 
   bool Create::setMainMotor(const float& main) {
-    return setAllMotors(main, sideMotorPower, vacuumMotorPower);
+    return setAllMotors(main, static_cast<float>(sideMotorPower) / 127.0, static_cast<float>(vacuumMotorPower) / 127.0);
   }
 
   bool Create::setSideMotor(const float& side) {
-    return setAllMotors(mainMotorPower, side, vacuumMotorPower);
+    return setAllMotors(static_cast<float>(mainMotorPower) / 127.0, side, static_cast<float>(vacuumMotorPower) / 127.0);
   }
 
   bool Create::setVacuumMotor(const float& vacuum) {
-    return setAllMotors(mainMotorPower, sideMotorPower, vacuum);
+    return setAllMotors(static_cast<float>(mainMotorPower) / 127.0, static_cast<float>(sideMotorPower) / 127.0, vacuum);
   }
 
   bool Create::updateLEDs() {
