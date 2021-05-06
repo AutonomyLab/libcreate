@@ -1,0 +1,20 @@
+# GitHub Action to run cpplint recursively on all pushes and pull requests
+# https://github.com/cpplint/GitHub-Action-for-cpplint
+
+name: cpplint
+on:
+  # Run for any commit in origin repository
+  push:
+  # And pull requests from forks
+  pull_request:
+    branches:
+      # This avoids running the job twice for PRs from origin repository
+    - '**:**'
+jobs:
+  cpplint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+    - run: pip install cpplint
+    - run: cpplint --recursive --filter=-whitespace/braces --linelength=100 .
