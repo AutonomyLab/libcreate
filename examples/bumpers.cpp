@@ -60,9 +60,9 @@ int main(int argc, char** argv) {
   // Switch to Full mode
   robot.setMode(create::MODE_FULL);
 
-  uint16_t light_signals[6];
-  bool light_bumpers[6];
-  bool contact_bumpers[2];
+  uint16_t light_signals[6] = {0, 0, 0, 0, 0, 0};
+  bool light_bumpers[6] = {false, false, false, false, false, false};
+  bool contact_bumpers[2] = {false, false};
 
   while (true) {
     // Get light sensor data (only available for Create 2 or later robots)

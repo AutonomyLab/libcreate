@@ -101,10 +101,16 @@ namespace create {
     // Get current time
     auto curTime = std::chrono::steady_clock::now();
     float dt = static_cast<std::chrono::duration<float>>(curTime - prevOnDataTime).count();
-    float deltaDist, deltaX, deltaY, deltaYaw, leftWheelDist, rightWheelDist, wheelDistDiff;
+    float deltaDist = 0.0f;
+    float deltaX = 0.0f;
+    float deltaY = 0.0f;
+    float deltaYaw = 0.0f;
+    float leftWheelDist = 0.0f;
+    float rightWheelDist = 0.0f;
+    float wheelDistDiff = 0.0f;
 
     // Protocol versions 1 and 2 use distance and angle fields for odometry
-    int16_t angleField;
+    int16_t angleField = 0;
     if (model.getVersion() <= V_2) {
       // This is a standards compliant way of doing unsigned to signed conversion
       uint16_t distanceRaw = GET_DATA(ID_DISTANCE);
@@ -318,7 +324,7 @@ namespace create {
       // Switch to safe mode (required for compatibility with V_1)
       if (!(serial->sendOpcode(OC_START) && serial->sendOpcode(OC_CONTROL))) return false;
     }
-    bool ret;
+    bool ret = false;
     switch (mode) {
       case MODE_OFF:
         if (model.getVersion() == V_2) {
