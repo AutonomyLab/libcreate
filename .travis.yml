@@ -11,6 +11,8 @@ matrix:
       dist: xenial
     - os: linux
       dist: bionic
+    - os: linux
+      dist: focal
 
 before_install:
   - sudo apt-get update -qq
