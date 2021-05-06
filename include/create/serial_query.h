@@ -67,7 +67,7 @@ namespace create {
       void processByte(uint8_t byteRead);
 
     public:
-      SerialQuery(std::shared_ptr<Data> data);
+      SerialQuery(std::shared_ptr<Data> data, bool install_signal_handler = true);
   };
 }  // namespace create
 

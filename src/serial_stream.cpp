@@ -6,7 +6,7 @@
 
 namespace create {
 
-  SerialStream::SerialStream(std::shared_ptr<Data> d, const uint8_t& header) : Serial(d), readState(READ_HEADER), headerByte(header) {
+  SerialStream::SerialStream(std::shared_ptr<Data> d, const uint8_t& header, bool install_signal_handler) : Serial(d, install_signal_handler), readState(READ_HEADER), headerByte(header) {
   }
 
   bool SerialStream::startSensorStream() {

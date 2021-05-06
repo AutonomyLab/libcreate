@@ -14,7 +14,7 @@ namespace create {
 
   namespace ublas = boost::numeric::ublas;
 
-  void Create::init() {
+  void Create::init(bool install_signal_handler) {
     mainMotorPower = 0;
     sideMotorPower = 0;
     vacuumMotorPower = 0;
@@ -44,18 +44,21 @@ namespace create {
     dtHistoryLength = 100;
     data = std::shared_ptr<Data>(new Data(model.getVersion()));
     if (model.getVersion() == V_1) {
-      serial = std::make_shared<SerialQuery>(data);
+      serial = std::make_shared<SerialQuery>(data, install_signal_handler);
     } else {
-      serial = std::make_shared<SerialStream>(data);
+      serial = std::make_shared<SerialStream>(
+        data, create::util::STREAM_HEADER, install_signal_handler);
     }
   }
 
-  Create::Create(RobotModel m) : model(m) {
-    init();
+  Create::Create(RobotModel m, bool install_signal_handler) : model(m) {
+    init(install_signal_handler);
   }
 
-  Create::Create(const std::string& dev, const int& baud, RobotModel m) : model(m) {
-    init();
+  Create::Create(const std::string& dev, const int& baud, RobotModel m, bool install_signal_handler)
+    : model(m)
+  {
+    init(install_signal_handler);
     serial->connect(dev, baud);
   }
 

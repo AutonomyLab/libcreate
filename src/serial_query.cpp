@@ -8,7 +8,8 @@
 
 namespace create {
 
-  SerialQuery::SerialQuery(std::shared_ptr<Data> d) : Serial(d),
+  SerialQuery::SerialQuery(std::shared_ptr<Data> d, bool install_signal_handler)
+  : Serial(d, install_signal_handler),
     streamRecoveryTimer(io),
     packetID(ID_BUMP_WHEELDROP),
     packetByte(0),
