@@ -92,7 +92,7 @@ namespace create {
       float requestedLeftVel;
       float requestedRightVel;
 
-      void init();
+      void init(bool install_signal_handler);
       // Add two matrices and handle overflow case
       Matrix addMatrices(const Matrix &A, const Matrix &B) const;
       void onData();
@@ -109,8 +109,10 @@ namespace create {
        * Calling this constructor Does not attempt to establish a serial connection to the robot.
        *
        * \param model the type of the robot. See RobotModel to determine the value for your robot.
-        */
-      Create(RobotModel model = RobotModel::CREATE_2);
+       * \param install_signal_handler if true, then register a signal handler to disconnect from
+       *   the robot on SIGINT or SIGTERM.
+       */
+      Create(RobotModel model = RobotModel::CREATE_2, bool install_signal_handler = true);
 
       /**
        * \brief Attempts to establish serial connection to Create.
@@ -119,8 +121,10 @@ namespace create {
        * \param baud rate to communicate with Create. Typically,
        *        115200 for Create 2 and 57600 for Create 1.
        * \param model type of robot. See RobotModel to determine the value for your robot.
+       * \param install_signal_handler if true, then register a signal handler to disconnect from
+       *   the robot on SIGINT or SIGTERM.
        */
-      Create(const std::string& port, const int& baud, RobotModel model = RobotModel::CREATE_2);
+      Create(const std::string& port, const int& baud, RobotModel model = RobotModel::CREATE_2, bool install_signal_handler = true);
 
       /**
        * \brief Attempts to disconnect from serial.

@@ -69,7 +69,10 @@ namespace create {
       void processByte(uint8_t byteRead);
 
     public:
-      SerialStream(std::shared_ptr<Data> data, const uint8_t& header = create::util::STREAM_HEADER);
+      SerialStream(
+        std::shared_ptr<Data> data,
+        const uint8_t& header = create::util::STREAM_HEADER,
+        bool install_signal_handler = true);
 
   };
 }  // namespace create

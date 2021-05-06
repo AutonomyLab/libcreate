@@ -7,14 +7,19 @@
 
 namespace create {
 
-  Serial::Serial(std::shared_ptr<Data> d) :
-    signals(io, SIGINT, SIGTERM),
+  Serial::Serial(std::shared_ptr<Data> d, bool install_signal_handler) :
+    signals(io),
     port(io),
     dataReady(false),
     isReading(false),
     data(d),
     corruptPackets(0),
-    totalPackets(0) {
+    totalPackets(0)
+  {
+    if (install_signal_handler) {
+      signals.add(SIGINT);
+      signals.add(SIGTERM);
+    }
   }
 
   Serial::~Serial() {

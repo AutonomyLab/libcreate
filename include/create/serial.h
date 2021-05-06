@@ -86,7 +86,7 @@ namespace create {
       void notifyDataReady();
 
     public:
-      Serial(std::shared_ptr<Data> data);
+      Serial(std::shared_ptr<Data> data, bool install_signal_handler);
       ~Serial();
       bool connect(const std::string& port, const int& baud = 115200, std::function<void()> cb = 0);
       void disconnect();
