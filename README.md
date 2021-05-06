@@ -12,7 +12,7 @@ C++ library for interfacing with iRobot's [Create 1 and 2](http://www.irobot.com
 
 ## Build Status ##
 
-![Build Status](https://api.travis-ci.org/AutonomyLab/libcreate.svg?branch=master)
+![Build Status](https://github.com/AutonomyLab/libcreate/workflows/Build%20and%20test/badge.svg)
 
 ## Dependencies ##
 
