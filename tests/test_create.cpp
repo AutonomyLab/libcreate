@@ -44,12 +44,6 @@ TEST(CreateTest, ConstructorSingleParam)
   create::Create create_roomba_400(create::RobotModel::ROOMBA_400);
 }
 
-// TEST(CreateTest, ConstructorMultiParam)
-// {
-//   TODO(jacobperron): Document exception thrown and consider defining custom exception
-//   create::Create create(std::string("/dev/ttyUSB0"), 11520);
-// }
-
 TEST(CreateTest, Connected)
 {
   create::Create create;

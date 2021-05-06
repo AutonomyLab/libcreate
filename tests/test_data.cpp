@@ -28,13 +28,13 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
-#include "create/data.h"
-#include "create/packet.h"
-#include "create/types.h"
+#include <memory>
 
 #include "gtest/gtest.h"
 
-#include <memory>
+#include "create/data.h"
+#include "create/packet.h"
+#include "create/types.h"
 
 TEST(DataTest, Constructor)
 {
