@@ -42,6 +42,7 @@ namespace create {
     requestedLeftVel = 0;
     requestedRightVel = 0;
     dtHistoryLength = 100;
+    modeReportWorkaround = false;
     data = std::shared_ptr<Data>(new Data(model.getVersion()));
     if (model.getVersion() == V_1) {
       serial = std::make_shared<SerialQuery>(data, install_signal_handler);
@@ -1117,10 +1118,23 @@ namespace create {
     return requestedRightVel;
   }
 
+  void Create::setModeReportWorkaround(const bool& enable) {
+    modeReportWorkaround = enable;
+  }
+
+  bool Create::getModeReportWorkaround() const {
+    return modeReportWorkaround;
+  }
+
   create::CreateMode Create::getMode() {
     if (data->isValidPacketID(ID_OI_MODE)) {
-      mode = (create::CreateMode) GET_DATA(ID_OI_MODE);
+      if (modeReportWorkaround) {
+        mode = (create::CreateMode) (GET_DATA(ID_OI_MODE) - 1);
+      } else {
+        mode = (create::CreateMode) GET_DATA(ID_OI_MODE);
+      }
     }
+
     return mode;
   }
 
