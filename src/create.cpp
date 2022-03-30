@@ -1064,7 +1064,7 @@ namespace create {
     }
   }
 
-  bool Create::isSideBrushOvercurrent() const { 
+  bool Create::isSideBrushOvercurrent() const {
     if (data->isValidPacketID(ID_OVERCURRENTS)) {
       return (GET_DATA(ID_OVERCURRENTS) & 0x01) != 0;
     }
@@ -1074,7 +1074,7 @@ namespace create {
     }
   }
 
-  bool Create::isMainBrushOvercurrent() const { 
+  bool Create::isMainBrushOvercurrent() const {
     if (data->isValidPacketID(ID_OVERCURRENTS)) {
       return (GET_DATA(ID_OVERCURRENTS) & 0x04) != 0;
     }
@@ -1083,8 +1083,8 @@ namespace create {
       return false;
     }
   }
-  
-  bool Create::isWheelOvercurrent() const { 
+
+  bool Create::isWheelOvercurrent() const {
     if (data->isValidPacketID(ID_OVERCURRENTS)) {
       return (GET_DATA(ID_OVERCURRENTS) & 0x18) != 0;
     }

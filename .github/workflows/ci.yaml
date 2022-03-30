@@ -1,12 +1,9 @@
 name: Build and test
+
 on:
-  # Run for any commit in origin repository
   push:
-  # And pull requests from forks
+    branches: ['master']
   pull_request:
-    branches:
-      # This avoids running the job twice for PRs from origin repository
-    - '**:**'
 
 env:
   BUILD_TYPE: Release
