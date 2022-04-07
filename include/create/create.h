@@ -98,6 +98,10 @@ namespace create {
       void onData();
       bool updateLEDs();
 
+      // Flag to enable/disable the workaround for some 6xx incorrectly reporting OI mode
+      // https://github.com/AutonomyLab/create_robot/issues/64
+      bool modeReportWorkaround;
+
     protected:
       std::shared_ptr<create::Data> data;
       std::shared_ptr<create::Serial> serial;
@@ -673,6 +677,20 @@ namespace create {
        * \return total number of serial packets.
        */
       uint64_t getTotalPackets() const;
+
+      /**
+       * \brief Enable or disable the mode reporting workaround.
+       * Some Roomba 6xx robots incorrectly report the OI mode in their sensor streams. Enabling the workaround
+       * will cause libcreate to decrement the reported OI mode in the sensor stream by 1.
+       * See https://github.com/AutonomyLab/create_robot/issues/64
+       */
+      void setModeReportWorkaround(const bool& enable);
+
+      /**
+       * \return true if the mode reporting workaround is enabled, false otherwise.
+       */
+      bool getModeReportWorkaround() const;
+
   };  // end Create class
 
 }  // namespace create

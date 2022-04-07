@@ -8,7 +8,7 @@ C++ library for interfacing with iRobot's [Create 1 and 2](http://www.irobot.com
   - [`V_2`](https://drive.google.com/file/d/0B9O4b91VYXMdMmFPMVNDUEZ6d0U) (Create 1, Roomba 500 series)
   - [`V_3`](https://drive.google.com/file/d/0B9O4b91VYXMdSVk4amw1N09mQ3c) (Create 2, Roomba 600-800 series)
 * Author: [Jacob Perron](http://jacobperron.ca) ([Autonomy Lab](http://autonomylab.org), [Simon Fraser University](http://www.sfu.ca))
-* Contributors: [Mani Monajjemi](http:mani.im), [Ben Wolsieffer](https://github.com/lopsided98)
+* Contributors: [Mani Monajjemi](http:mani.im), [Ben Wolsieffer](https://github.com/lopsided98), [Josh Gadeken](https://github.com/process1183)
 
 ## Build Status ##
 
@@ -72,3 +72,5 @@ To run unit tests, execute the following in the build directory:
 
 * _Clock_ and _Schedule_ buttons are not functional. This is a known bug related to the firmware.
 * Inaccurate odometry angle for Create 1 ([#22](https://github.com/AutonomyLab/libcreate/issues/22))
+* Some 600 series models incorrectly report the OI Mode in their sensor stream ([create_robot #64](https://github.com/AutonomyLab/create_robot/issues/64))
+  - To enable or disable the OI Mode reporting workaround, pass `true` or `false` to `setModeReportWorkaround()`
