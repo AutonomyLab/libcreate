@@ -2,6 +2,22 @@
 Changelog for package libcreate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.0.0 (2022-04-06)
+------------------
+* Add option to workaround bug where firmware reports unexpected OI mode (`#67 <https://github.com/AutonomyLab/libcreate/issues/67>`_)
+* Update links to serial protocol documentation
+* Add option to disable signal handlers (`#65 <https://github.com/AutonomyLab/libcreate/issues/65>`_)
+* Fix 'maybe-uninitialized' warnings
+* Remove travis.yml
+* Add GitHub workflow for CI
+* Fix motor setting (`#62 <https://github.com/AutonomyLab/libcreate/issues/62>`_)
+* Use average dt values for velocity calculation (`#60 <https://github.com/AutonomyLab/libcreate/issues/60>`_)
+* Use steady clock for computing velocity (`#59 <https://github.com/AutonomyLab/libcreate/issues/59>`_)
+* Replace boost features with C++11 equivalents (`#58 <https://github.com/AutonomyLab/libcreate/issues/58>`_)
+* Implement methods for getting overcurrent status (`#57 <https://github.com/AutonomyLab/libcreate/issues/57>`_)
+* Use OC_MOTORS instead of OC_MOTORS_PWM on V_1 models (`#55 <https://github.com/AutonomyLab/libcreate/issues/55>`_)
+* Contributors: Daniel Smith, Jacob Perron, Josh Gadeken, Stefan Krupop, tim-fan
+
 2.0.0 (2019-09-02)
 ------------------
 * Cleanup examples
