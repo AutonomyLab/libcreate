@@ -68,6 +68,7 @@ namespace create {
 
     public:
       SerialQuery(std::shared_ptr<Data> data, bool install_signal_handler = true);
+      virtual ~SerialQuery() = default;
   };
 }  // namespace create
 
