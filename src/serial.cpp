@@ -40,26 +40,26 @@ namespace create {
 
   bool Serial::connect(const std::string& portName, const int& baud, std::function<void()> cb) {
     using namespace boost::asio;
-    port.open(portName);
-    port.set_option(serial_port::baud_rate(baud));
-    port.set_option(serial_port::character_size(8));
-    port.set_option(serial_port::parity(serial_port::parity::none));
-    port.set_option(serial_port::stop_bits(serial_port::stop_bits::one));
-    port.set_option(serial_port::flow_control(serial_port::flow_control::none));
+    if (!openPort(portName, baud)) {
+      return false;
+    }
 
     signals.async_wait(std::bind(&Serial::signalHandler, this, std::placeholders::_1, std::placeholders::_2));
 
     usleep(1000000);
 
-    if (port.is_open()) {
-      callback = cb;
-      bool startReadSuccess = startReading();
-      if (!startReadSuccess) {
-        port.close();
-      }
-      return startReadSuccess;
+    if (!port.is_open()) {
+      return false;
     }
-    return false;
+
+    callback = cb;
+    bool startReadSuccess = startReading();
+    if (!startReadSuccess) {
+      closePort();
+      return false;
+    }
+
+    return true;
   }
 
   void Serial::disconnect() {
@@ -74,6 +74,33 @@ namespace create {
       sendOpcode(OC_STOP);
       port.close();
     }
+  }
+
+  bool Serial::openPort(const std::string& portName, const int& baud) {
+    using namespace boost::asio;
+    try {
+      port.open(portName);
+      port.set_option(serial_port::baud_rate(baud));
+      port.set_option(serial_port::character_size(8));
+      port.set_option(serial_port::parity(serial_port::parity::none));
+      port.set_option(serial_port::stop_bits(serial_port::stop_bits::one));
+      port.set_option(serial_port::flow_control(serial_port::flow_control::none));
+    } catch (const boost::system::system_error& /*e*/) {
+      CERR("[create::Serial] ", "failed to open port: " << portName);
+      return false;
+    }
+    return true;
+  }
+
+  bool Serial::closePort() {
+    using namespace boost::asio;
+    try {
+      port.close();
+    } catch (const boost::system::system_error& /*e*/) {
+      CERR("[create::Serial] ", "failed to close port");
+      return false;
+    }
+    return true;
   }
 
   bool Serial::startReading() {
@@ -186,8 +213,13 @@ namespace create {
       CERR("[create::Serial] ", "send failed, not connected.");
       return false;
     }
-    // TODO: catch boost exceptions
-    boost::asio::write(port, boost::asio::buffer(bytes, numBytes));
+    
+    try {
+      boost::asio::write(port, boost::asio::buffer(bytes, numBytes));
+    } catch (const boost::system::system_error & e) {
+      CERR("[create::Serial] ", "failed to write bytes to port");
+      return false;
+    }
     return true;
   }
 

@@ -71,6 +71,8 @@ namespace create {
       // Start and stop reading data from Create
       bool startReading();
       void stopReading();
+      bool openPort(const std::string& portName, const int& baud);
+      bool closePort();
 
     protected:
       std::shared_ptr<Data> data;
