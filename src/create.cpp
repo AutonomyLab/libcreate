@@ -160,10 +160,10 @@ namespace create {
       prevTicksRight = totalTicksRight;
 
       // Handle wrap around
-      if (fabs(ticksLeft) > 0.9 * util::V_3_MAX_ENCODER_TICKS) {
+      if (std::abs(ticksLeft) > 0.9 * util::V_3_MAX_ENCODER_TICKS) {
         ticksLeft = (ticksLeft % util::V_3_MAX_ENCODER_TICKS) + 1;
       }
-      if (fabs(ticksRight) > 0.9 * util::V_3_MAX_ENCODER_TICKS) {
+      if (std::abs(ticksRight) > 0.9 * util::V_3_MAX_ENCODER_TICKS) {
         ticksRight = (ticksRight % util::V_3_MAX_ENCODER_TICKS) + 1;
       }
 
@@ -373,7 +373,7 @@ namespace create {
         min > 59)
       return false;
 
-    uint8_t cmd[4] = { OC_DATE, day, hour, min };
+    uint8_t cmd[4] = { OC_DATE, static_cast<uint8_t>(day), hour, min };
     return serial->send(cmd, 4);
   }
 

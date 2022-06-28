@@ -73,6 +73,7 @@ namespace create {
         std::shared_ptr<Data> data,
         const uint8_t& header = create::util::STREAM_HEADER,
         bool install_signal_handler = true);
+      virtual ~SerialStream() = default;
 
   };
 }  // namespace create
