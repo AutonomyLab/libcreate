@@ -2,6 +2,12 @@
 Changelog for package libcreate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.1.0 (2023-05-09)
+------------------
+* Address warnings and errors
+* Catch boost exceptions in Serial.h
+* Contributors: Swapnil Patel
+
 3.0.0 (2022-04-06)
 ------------------
 * Add option to workaround bug where firmware reports unexpected OI mode (`#67 <https://github.com/AutonomyLab/libcreate/issues/67>`_)
