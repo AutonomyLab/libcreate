@@ -32,6 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #define CREATE_PACKET_H
 
 #include <mutex>
+#include <string>
 
 namespace create {
   class Packet {
