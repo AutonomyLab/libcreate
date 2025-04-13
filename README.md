@@ -7,7 +7,7 @@ C++ library for interfacing with iRobot's Create 1 and 2 as well as most models 
   - [`V_1`](https://drive.google.com/file/d/0B9O4b91VYXMdUHlqNklDU09NU0k/view?usp=sharing&resourcekey=0-KxMpRPBMsGAj7eSYC_9ewA) (Roomba 400 series )
   - [`V_2`](https://drive.google.com/file/d/0B9O4b91VYXMdMmFPMVNDUEZ6d0U/view?usp=sharing&resourcekey=0-bqKH8xhtWdYtTik_LLWo9Q) (Create 1, Roomba 500 series)
   - [`V_3`](https://drive.google.com/file/d/0B9O4b91VYXMdSVk4amw1N09mQ3c/view?usp=sharing&resourcekey=0-rKvug2IzC7nj4zV31EJtww) (Create 2, Roomba 600-800 series)
-* Author: [Jacob Perron](http://jacobperron.ca) ([Autonomy Lab](http://autonomylab.org), [Simon Fraser University](http://www.sfu.ca))
+* Author: [Jacob Perron](http://jacobperron.ca) ([Autonomy Lab](https://autonomy.cs.sfu.ca), [Simon Fraser University](http://www.sfu.ca))
 * Contributors: [Mani Monajjemi](http:mani.im), [Ben Wolsieffer](https://github.com/lopsided98), [Josh Gadeken](https://github.com/process1183)
 
 ## Build Status ##
